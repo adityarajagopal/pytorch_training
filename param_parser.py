@@ -45,9 +45,12 @@ class Params() :
         self.use_cuda = True
         self.start_epoch = 0 
         self.curr_epoch = 0 
-        self.loss = 0 
-        self.top1 = 1
-        self.top5 = 1
+        self.train_loss = 0 
+        self.train_top1 = 1
+        self.train_top5 = 1
+        self.test_loss = 0 
+        self.test_top1 = 1
+        self.test_top5 = 1
 
     def get_state(self) : 
         return self.__dict__

@@ -32,8 +32,7 @@ class Checkpointer(object) :
         self.logfile = os.path.join(new_dir, 'log.csv')
         
         f = open(self.logfile, 'w+')
-        # f.write('Epoch,\tLoss,\tTop1,\tTop5\n')
-        f.write('Epoch,\tLR,\tLoss,\tTop1,\tTop5\n')
+        f.write('Epoch,\tLR,\tLoss_Train,\tTop1_Train,\tTop5_Train,\tLoss_Test,\tTop1_Test,\tTop5_Test\n')
         f.close()
 
     def __create_copy_log(self, new_root, old_root, prev_epoch) : 
@@ -103,7 +102,7 @@ class Checkpointer(object) :
 
         # write to log file
         with open(self.logfile, 'a') as f :
-            line = str(internal_state_dict['curr_epoch']) + ',\t' + str(internal_state_dict['lr']) + '\t' + str(internal_state_dict['loss'].item()) + ',\t' + str(internal_state_dict['top1'].item()) + ',\t' + str(internal_state_dict['top5'].item()) + '\n'
+            line = str(internal_state_dict['curr_epoch']) + ',\t' + str(internal_state_dict['lr']) + ',\t' + str(internal_state_dict['train_loss'].item()) + ',\t' + str(internal_state_dict['train_top1'].item()) + ',\t' + str(internal_state_dict['train_top5'].item()) + ',\t' + str(internal_state_dict['test_loss'].item()) + ',\t' + str(internal_state_dict['test_top1'].item()) + ',\t' + str(internal_state_dict['test_top5'].item()) + '\n'
             f.write(line)
 
         # create checkpoints to store

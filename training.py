@@ -4,6 +4,7 @@ import time
 import torch.autograd
 
 import utils
+import inference
 
 def update_lr(params, optimiser) : 
     # update learning rate
@@ -42,10 +43,9 @@ def train(model, criterion, optimiser, inputs, targets) :
     return (loss, prec1, prec5)
 
 def train_network(params, tbx_writer, checkpointer, train_loader, test_loader, model, criterion, optimiser) :  
-    print('Epoch,\tLR,\tLoss,\tTop1,\tTop5')
+    print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5')
     
     for epoch in range(params.start_epoch, params.epochs) : 
-        # state['curr_epoch'] = epoch
         params.curr_epoch = epoch
         state = update_lr(params, optimiser)
 
@@ -66,13 +66,16 @@ def train_network(params, tbx_writer, checkpointer, train_loader, test_loader, m
             top1.update(prec1) 
             top5.update(prec5)
 
-        params.loss = losses.avg        
-        params.top1 = top1.avg        
-        params.top5 = top5.avg        
+        params.train_loss = losses.avg        
+        params.train_top1 = top1.avg        
+        params.train_top5 = top5.avg        
+
+        # get test loss
+        params.test_loss, params.test_top1, params.test_top5 = inference.test_network(params, test_loader, model, criterion, optimiser)
         
         checkpointer.save_checkpoint(model.state_dict(), optimiser.state_dict(), params.get_state())
         
-        print('{},\t{},\t{},\t{},\t{}'.format(epoch, params.lr, losses.avg, top1.avg, top5.avg))
+        print('{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(epoch, params.lr, params.train_loss, params.train_top1, params.train_top5, params.test_loss, params.test_top1, params.test_top5))
 
 
 
