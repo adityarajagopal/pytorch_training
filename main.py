@@ -2,13 +2,13 @@ import os
 import random
 import sys
 
-import param_parser as pp
-import input_preprocessor as preproc
-import model_creator as mc
-import training
-import inference
-import utils
-from checkpointing import Checkpointer
+import src.param_parser as pp
+import src.input_preprocessor as preproc
+import src.model_creator as mc
+import src.training as training
+import src.inference as inference
+import src.utils as utils
+from src.checkpointing import Checkpointer
 
 import tensorboardX as tbx
 
@@ -23,7 +23,7 @@ def main() :
         params = pp.parse_config_file(args.config_file)
     else : 
         raise ValueError('Need to specify config file with parameters')
-    
+
     # TODO: need to make cli consistent with final version of config file else : 
         # params = args 
         # state = {k: v for k,v in args._get_kwargs()}
@@ -67,7 +67,7 @@ def main() :
         sys.stdout = utils.TeePrinting(params.tee_printing)
 
     # setup tensorboardX and checkpointer  
-    tbx_writer = tbx.SummaryWriter(comment='test-1')
+    tbx_writer = tbx.SummaryWriter(comment='-test-1')
 
     if params.evaluate == False : 
         # train model 
