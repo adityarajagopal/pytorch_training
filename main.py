@@ -2,6 +2,7 @@ import os
 import random
 import sys
 
+import src.app as applic
 import src.param_parser as pp
 import src.input_preprocessor as preproc
 import src.model_creator as mc
@@ -20,7 +21,8 @@ def main() :
     print('==> Parsing Config File')
     args = pp.parse_command_line_args()
     if args.config_file != 'None' : 
-        params = pp.parse_config_file(args.config_file)
+        # params = pp.parse_config_file(args.config_file)
+        app = applic.Application(configFile)
     else : 
         raise ValueError('Need to specify config file with parameters')
 
