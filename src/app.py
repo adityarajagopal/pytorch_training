@@ -54,7 +54,7 @@ class Application(object):
         self.checkpointer = checkpointingSrc.Checkpointer(self.params, configFile)
         self.setup_params()
 
-    def setup_others(self)
+    def setup_others(self):
         self.preproc = preprocSrc.Preproc()
         self.mc = mcSrc.ModelCreator()
         self.trainer = trainingSrc.Trainer()
