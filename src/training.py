@@ -1,5 +1,6 @@
 import sys
 import time
+from tqdm import tqdm
 
 import torch.autograd
 
@@ -45,7 +46,7 @@ class Trainer(object):
     def train_network(self, params, tbx_writer, checkpointer, train_loader, test_loader, model, criterion, optimiser, inferer) :  
         print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5')
         
-        for epoch in range(params.start_epoch, params.epochs) : 
+        for epoch in tqdm(range(params.start_epoch, params.epochs), desc='training', leave=False) : 
             params.curr_epoch = epoch
             state = self.update_lr(params, optimiser)
     
@@ -53,7 +54,7 @@ class Trainer(object):
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
             
-            for batch_idx, (inputs, targets) in enumerate(train_loader) : 
+            for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader), total=len(train_loader)-1, desc='epoch', leave=False): 
                 # move inputs and targets to GPU
                 if params.use_cuda : 
                     inputs, targets = inputs.cuda(), targets.cuda()
@@ -73,9 +74,9 @@ class Trainer(object):
             # get test loss
             params.test_loss, params.test_top1, params.test_top5 = inferer.test_network(params, test_loader, model, criterion, optimiser)
             
-            checkpointer.save_checkpoint(model.state_dict(), optimiser.state_dict(), params.get_state())
+            checkpointer.save_checkpoint(model.state_dict(), optimiser.state_dict(), params)
             
-            print('{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(epoch, params.lr, params.train_loss, params.train_top1, params.train_top5, params.test_loss, params.test_top1, params.test_top5))
+            tqdm.write('{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(epoch, params.lr, params.train_loss, params.train_top1, params.train_top5, params.test_loss, params.test_top1, params.test_top5))
 
 
 

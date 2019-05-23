@@ -17,6 +17,7 @@ class Params() :
         self.compression_rate = config_file.get('cnn', 'compression_rate')
 
         # self.start_epoch = config_file.getint('training_hyperparameters', 'start_epoch')
+        self.printOnly = config_file.getboolean('training_hyperparameters', 'print_only')
         self.epochs = config_file.getint('training_hyperparameters', 'total_epochs')
         self.train_batch = config_file.getint('training_hyperparameters', 'train_batch')
         self.test_batch = config_file.getint('training_hyperparameters', 'test_batch') 
@@ -51,6 +52,7 @@ class Params() :
         self.test_loss = 0 
         self.test_top1 = 1
         self.test_top5 = 1
+        self.bestValidLoss = 0.0
 
     def get_state(self) : 
         return self.__dict__

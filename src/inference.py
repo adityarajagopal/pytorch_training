@@ -1,4 +1,5 @@
 import torch.autograd
+from tqdm import tqdm
 
 import src.utils as utils
 
@@ -10,15 +11,16 @@ class Inferer(object):
         top1 = utils.AverageMeter()
         top5 = utils.AverageMeter()
     
-        for batch_idx, (inputs, targets) in enumerate(test_loader) : 
+        for batch_idx, (inputs, targets) in tqdm(enumerate(test_loader), total=len(test_loader)-1, desc='inference', leave=False) : 
             # move inputs and targets to GPU
-            if params.use_cuda : 
-                inputs, targets = inputs.cuda(), targets.cuda()
-            inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
-            
-            # perform inference 
-            outputs = model(inputs) 
-            loss = criterion(outputs, targets)
+            with torch.no_grad():
+                if params.use_cuda : 
+                    inputs, targets = inputs.cuda(), targets.cuda()
+                inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
+                
+                # perform inference 
+                outputs = model(inputs) 
+                loss = criterion(outputs, targets)
             
             prec1, prec5 = utils.accuracy(outputs.data, targets.data)
     
@@ -27,5 +29,5 @@ class Inferer(object):
             top5.update(prec5)
     
         if params.evaluate == True : 
-            print('Loss: {}, Top1: {}, Top5: {}'.format(losses.avg, top1.avg, top5.avg))
+            tqdm.write('Loss: {}, Top1: {}, Top5: {}'.format(losses.avg, top1.avg, top5.avg))
         return (losses.avg, top1.avg, top5.avg)

@@ -3,9 +3,13 @@ import subprocess
 import sys
 import torch
 
+import time
+import datetime
+
 class Checkpointer(object) : 
-    def __init__(self, params) : 
+    def __init__(self, params, configFile) : 
         self.logfile = None
+        self.configFile = configFile
         self.root = self.__get_root_dir(params)
         if params.resume == True : 
             self.created_dir = True
@@ -91,27 +95,45 @@ class Checkpointer(object) :
             return new_dir
 
         else :
-            new_dir = os.path.join(params.checkpoint, params.test_name, 'orig')
+            ts = time.time()
+            timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
+            new_dir = os.path.join(params.checkpoint, params.test_name, timeStamp, 'orig')
             return new_dir
       
-    def save_checkpoint(self, model_dict, optimiser_dict, internal_state_dict) : 
+    # def save_checkpoint(self, model_dict, optimiser_dict, internal_state_dict) : 
+    def save_checkpoint(self, model_dict, optimiser_dict, params) : 
+        if params.printOnly == True:
+            return
+
         # create directory if not done already, this way empty directory is never created
         if self.created_dir == False : 
             self.__create_dir(self.root)
             self.__create_log(self.root)
+        
+        # copy config file into root dir
+        cmd = 'cp ' + self.configFile + ' ' + self.root
+        subprocess.check_call(cmd, shell=True)         
 
         # write to log file
         with open(self.logfile, 'a') as f :
-            line = str(internal_state_dict['curr_epoch']) + ',\t' + str(internal_state_dict['lr']) + ',\t' + str(internal_state_dict['train_loss'].item()) + ',\t' + str(internal_state_dict['train_top1'].item()) + ',\t' + str(internal_state_dict['train_top5'].item()) + ',\t' + str(internal_state_dict['test_loss'].item()) + ',\t' + str(internal_state_dict['test_top1'].item()) + ',\t' + str(internal_state_dict['test_top5'].item()) + '\n'
+            line = str(params.curr_epoch) + ',\t' + str(params.lr) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + ',\t' + str(params.test_loss.item()) + ',\t' + str(params.test_top1.item()) + ',\t' + str(params.test_top5.item()) + '\n'
             f.write(line)
 
         # create checkpoints to store
-        modelpath = os.path.join(self.root, str(internal_state_dict['curr_epoch']) + '-model' + '.pth.tar')
-        statepath = os.path.join(self.root, str(internal_state_dict['curr_epoch']) + '-state' + '.pth.tar')
+        modelpath = os.path.join(self.root, str(params.curr_epoch) + '-model' + '.pth.tar')
+        statepath = os.path.join(self.root, str(params.curr_epoch) + '-state' + '.pth.tar')
 
         # store checkpoints
         torch.save(model_dict, modelpath) 
-        torch.save(internal_state_dict, statepath)
+        torch.save(params.get_state(), statepath)
+            
+        # store best model separately 
+        if params.test_top1 >= params.bestValidLoss:
+            params.bestValidLoss = params.test_top1
+            bestModelPath = os.path.join(self.root, 'best-model' + '.pth.tar')
+            bestStatePath = os.path.join(self.root, 'best-state' + '.pth.tar')
+            torch.save(model_dict, bestModelPath) 
+            torch.save(params.get_state(), bestStatePath)
 
     def restore_state(self, params): 
         # get state to load from

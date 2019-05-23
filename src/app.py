@@ -50,11 +50,11 @@ class Application(object):
         print('==> Performing Inference')
         self.inferer.test_network(self.params, self.test_loader, self.model, self.criterion, self.optimiser)
 
-    def setup_param_checkpoint(self):
+    def setup_param_checkpoint(self, configFile):
         config = cp.ConfigParser() 
         config.read(configFile)
         self.params = ppSrc.Params(config)
-        self.checkpointer = checkpointingSrc.Checkpointer(self.params)
+        self.checkpointer = checkpointingSrc.Checkpointer(self.params, configFile)
         self.setup_params()
 
     def setup_dataset(self):
