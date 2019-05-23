@@ -68,89 +68,104 @@ class Preproc(object):
         print('Preparing dataset %s' % dataset)
     
         # CIFAR10
-        if dataset == 'cifar10' : 
-            # data_loc = '/home/ar4414/multipres_training/organised/data'
-            data_loader = torchvision.datasets.CIFAR10
-            num_classes = 10 
-            
-            train_transform = torchvision.transforms.Compose([
-                torchvision.transforms.RandomCrop(32, padding=4),
-                torchvision.transforms.RandomHorizontalFlip(),
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-            ])
-    
-            test_transform = torchvision.transforms.Compose([
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-            ])
-    
-            train_set = data_loader(root=data_loc, train=True, download=False, transform=train_transform)
-            test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
-            
-            train_loader = torch.utils.data.DataLoader(train_set, batch_size=train_batch, shuffle=True, num_workers=workers)
-            test_loader = torch.utils.data.DataLoader(test_set, batch_size=test_batch, shuffle=False, num_workers=workers)
+        if dataset == 'cifar10': 
+            (train_loader, test_loader) = self.cifar10(data_loc, workers, params)
     
         # CIFAR100
-        elif dataset == 'cifar100' : 
-            # data_loc = '/home/ar4414/multipres_training/organised/data'
-            data_loader = torchvision.datasets.CIFAR100
-            if params.sub_classes != [] : 
-                print('Generating subset of dataset with classes %s' % params.sub_classes)
-                train_indices, test_indices = self.create_subclass_dataset(dataset, data_loc, params.sub_classes) 
-            num_classes = 100
-            
-            train_transform = torchvision.transforms.Compose([
-                torchvision.transforms.RandomCrop(32, padding=4),
-                torchvision.transforms.RandomHorizontalFlip(),
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-            ])
-    
-            test_transform = torchvision.transforms.Compose([
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-            ])
-    
-            train_set = data_loader(root=data_loc, train=True, download=False, transform=train_transform)
-            test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
-    
-            if params.sub_classes != [] :     
-                train_loader = torch.utils.data.DataLoader(train_set, batch_size=train_batch, num_workers=workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices))
-                test_loader = torch.utils.data.DataLoader(test_set, batch_size=test_batch, num_workers=workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(test_indices))
-            else : 
-                train_loader = torch.utils.data.DataLoader(train_set, batch_size=train_batch, shuffle=True, num_workers=workers)
-                test_loader = torch.utils.data.DataLoader(test_set, batch_size=test_batch, shuffle=False, num_workers=workers)
+        elif dataset == 'cifar100': 
+            (train_loader, test_loader) = self.cifar100(data_loc, workers, params)
         
         # ImageNet
         else : 
-            # data_loc = '/mnt/storage/imagenet_original/data'
-            if params.sub_classes != [] : 
-                data_loc = self.create_subclass_dataset(dataset, data_loc, params.sub_classes) 
-            # train_dir = os.path.join('/mnt/storage/imagenet_original/data', 'train')
-            # test_dir = os.path.join('/mnt/storage/imagenet_original/data', 'validation')
-            train_dir = os.path.join(data_loc, 'train')
-            test_dir = os.path.join(data_loc, 'validation')
-            num_classes = 1000
-                
-            train_transform = torchvision.transforms.Compose([
-                    torchvision.transforms.RandomResizedCrop(224),
-                    torchvision.transforms.RandomHorizontalFlip(),
-                    torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
-            ])
-                
-            test_transform = torchvision.transforms.Compose([
-                    torchvision.transforms.Resize(256),
-                    torchvision.transforms.CenterCrop(224),
-                    torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
-            ])
+            (train_loader, test_loader) = self.imageNet(data_loc, workers, params)
+    
+        return (train_loader, test_loader)
+
+    def imageNet(self, data_loc, workers, params):
+        # data_loc = '/mnt/storage/imagenet_original/data'
+        if params.sub_classes != [] : 
+            data_loc = self.create_subclass_dataset(params.dataset, data_loc, params.sub_classes) 
+        # train_dir = os.path.join('/mnt/storage/imagenet_original/data', 'train')
+        # test_dir = os.path.join('/mnt/storage/imagenet_original/data', 'validation')
+        train_dir = os.path.join(data_loc, 'train')
+        test_dir = os.path.join(data_loc, 'validation')
+        num_classes = 1000
             
-            train_set = torchvision.datasets.ImageFolder(train_dir, train_transform)
-            test_set = torchvision.datasets.ImageFolder(test_dir, test_transform)
+        train_transform = torchvision.transforms.Compose([
+                torchvision.transforms.RandomResizedCrop(224),
+                torchvision.transforms.RandomHorizontalFlip(),
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
+        ])
+            
+        test_transform = torchvision.transforms.Compose([
+                torchvision.transforms.Resize(256),
+                torchvision.transforms.CenterCrop(224),
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
+        ])
+        
+        train_set = torchvision.datasets.ImageFolder(train_dir, train_transform)
+        test_set = torchvision.datasets.ImageFolder(test_dir, test_transform)
+        
+        train_loader = torch.utils.data.DataLoader(train_set, batch_size=params.train_batch, shuffle=True, num_workers=workers)
+        test_loader = torch.utils.data.DataLoader(test_set, batch_size=params.test_batch, shuffle=False, num_workers=workers)
+        return (train_loader, test_loader)
+
+
+    def cifar100(self, data_loc, workers, params):
+        # data_loc = '/home/ar4414/multipres_training/organised/data'
+        data_loader = torchvision.datasets.CIFAR100
+        if params.sub_classes != [] : 
+            print('Generating subset of dataset with classes %s' % params.sub_classes)
+            train_indices, test_indices = self.create_subclass_dataset(params.dataset, data_loc, params.sub_classes) 
+        num_classes = 100
+        
+        train_transform = torchvision.transforms.Compose([
+            torchvision.transforms.RandomCrop(32, padding=4),
+            torchvision.transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        
+        test_transform = torchvision.transforms.Compose([
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        
+        train_set = data_loader(root=data_loc, train=True, download=False, transform=train_transform)
+        test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
+        
+        if params.sub_classes != [] :     
+            train_loader = torch.utils.data.DataLoader(train_set, batch_size=params.train_batch, num_workers=workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices))
+            test_loader = torch.utils.data.DataLoader(test_set, batch_size=params.test_batch, num_workers=workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(test_indices))
+        else : 
+            train_loader = torch.utils.data.DataLoader(train_set, batch_size=params.train_batch, shuffle=True, num_workers=workers)
+            test_loader = torch.utils.data.DataLoader(test_set, batch_size=params.test_batch, shuffle=False, num_workers=workers)
+        return (train_loader, test_loader)
+
+
+
+    def cifar10(self, data_loc, workers, params):
+        # data_loc = '/home/ar4414/multipres_training/organised/data'
+        data_loader = torchvision.datasets.CIFAR10
+        num_classes = 10 
+        
+        train_transform = torchvision.transforms.Compose([
+            torchvision.transforms.RandomCrop(32, padding=4),
+            torchvision.transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
     
-            train_loader = torch.utils.data.DataLoader(train_set, batch_size=train_batch, shuffle=True, num_workers=workers)
-            test_loader = torch.utils.data.DataLoader(test_set, batch_size=test_batch, shuffle=False, num_workers=workers)
+        test_transform = torchvision.transforms.Compose([
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
     
+        train_set = data_loader(root=data_loc, train=True, download=False, transform=train_transform)
+        test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
+        
+        train_loader = torch.utils.data.DataLoader(train_set, batch_size=params.train_batch, shuffle=True, num_workers=workers)
+        test_loader = torch.utils.data.DataLoader(test_set, batch_size=params.test_batch, shuffle=False, num_workers=workers)
         return (train_loader, test_loader)

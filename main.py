@@ -3,6 +3,9 @@ import random
 import sys
 
 import src.app as applic
+import src.dav114.importance_sampling.imp_samp_app as dav114app
+
+
 import src.param_parser as pp
 import src.input_preprocessor as preproc
 import src.model_creator as mc
@@ -18,6 +21,8 @@ import torch.cuda
 
 import argparse
 
+import getpass
+
 def parse_command_line_args() : 
     parser = argparse.ArgumentParser(description='PyTorch Pruning')
     parser.add_argument('--config-file', default='None', type=str, help='config file with training parameters')
@@ -28,9 +33,15 @@ def main() :
     # parse config
     print('==> Parsing Config File')
     args = parse_command_line_args()
+    
+    username = getpass.getuser()
+
     if args.config_file != 'None' : 
         # params = pp.parse_config_file(args.config_file)
-        app = applic.Application(args.config_file)
+        if username == 'dav114':
+            app = dav114app.ImpSampApp(args.config_file)
+        else:
+            app = applic.Application(args.config_file)
     else : 
         raise ValueError('Need to specify config file with parameters')
 

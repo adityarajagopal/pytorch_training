@@ -28,7 +28,8 @@ class ModelCreator(object):
             model = models.__dict__[params.arch](num_classes=num_classes)
         
         gpu_list = [int(x) for x in params.gpu_id.split(',')]
-        model = torch.nn.DataParallel(model, gpu_list).cuda()
+        model = torch.nn.DataParallel(model, gpu_list)
+        model = model.cuda()
     
         if params.resume == True or params.branch == True : 
             checkpoint = torch.load(params.pretrained)

@@ -19,17 +19,11 @@ import torch.cuda
 class Application(object):
     
     def __init__(self, configFile):
-        config = cp.ConfigParser() 
-        config.read(configFile)
-        self.params = ppSrc.Params(config)
-        self.checkpointer = checkpointingSrc.Checkpointer(self.params)
+        self.setup_param_checkpoint(configFile)
         self.preproc = preprocSrc.Preproc()
         self.mc = mcSrc.ModelCreator()
         self.trainer = trainingSrc.Trainer()
         self.inferer = inferenceSrc.Inferer()
-
-        self.setup_params()
-        self.main()
 
     def main(self):
         self.setup_dataset()
@@ -55,6 +49,13 @@ class Application(object):
         # perform inference only
         print('==> Performing Inference')
         self.inferer.test_network(self.params, self.test_loader, self.model, self.criterion, self.optimiser)
+
+    def setup_param_checkpoint(self):
+        config = cp.ConfigParser() 
+        config.read(configFile)
+        self.params = ppSrc.Params(config)
+        self.checkpointer = checkpointingSrc.Checkpointer(self.params)
+        self.setup_params()
 
     def setup_dataset(self):
         # setup dataset
