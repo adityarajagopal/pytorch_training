@@ -20,10 +20,7 @@ class Application(object):
     
     def __init__(self, configFile):
         self.setup_param_checkpoint(configFile)
-        self.preproc = preprocSrc.Preproc()
-        self.mc = mcSrc.ModelCreator()
-        self.trainer = trainingSrc.Trainer()
-        self.inferer = inferenceSrc.Inferer()
+        self.setup_others()
 
     def main(self):
         self.setup_dataset()
@@ -56,6 +53,12 @@ class Application(object):
         self.params = ppSrc.Params(config)
         self.checkpointer = checkpointingSrc.Checkpointer(self.params, configFile)
         self.setup_params()
+
+    def setup_others(self)
+        self.preproc = preprocSrc.Preproc()
+        self.mc = mcSrc.ModelCreator()
+        self.trainer = trainingSrc.Trainer()
+        self.inferer = inferenceSrc.Inferer()
 
     def setup_dataset(self):
         # setup dataset
