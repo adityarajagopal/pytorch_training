@@ -4,6 +4,7 @@ import torch.backends
 import torchvision 
 
 class ModelCreator(object):
+    
     def setup_model(self, params) : 
         model = self.read_model(params)
         model = self.transfer_to_gpu(params, model)
