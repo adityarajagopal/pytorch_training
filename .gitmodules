@@ -1,3 +1,6 @@
 [submodule "src/dav114/importance_sampling"]
 	path = src/dav114/importance_sampling
 	url = git@github.com:DiederikVink/importance_sampling.git
+[submodule "src/muppet"]
+	path = src/muppet
+	url = git@github.com:adityarajagopal/muppet.git
