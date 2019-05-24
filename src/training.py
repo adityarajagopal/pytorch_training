@@ -43,7 +43,7 @@ class Trainer(object):
     
         return (loss, prec1, prec5)
 
-    def batch_iter(self, train_loader, params, losses, top1, top5):
+    def batch_iter(self, model, criterion, optimiser, train_loader, params, losses, top1, top5):
         for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader), total=len(train_loader)-1, desc='epoch', leave=False): 
             # move inputs and targets to GPU
             if params.use_cuda : 
@@ -70,7 +70,7 @@ class Trainer(object):
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
             
-            batch_iter(train_loader, params, losses, top1, top5)
+            self.batch_iter(model, criterion, optimiser, train_loader, params, losses, top1, top5)
             
             params.train_loss = losses.avg        
             params.train_top1 = top1.avg        
