@@ -42,6 +42,22 @@ class Trainer(object):
         optimiser.step()
     
         return (loss, prec1, prec5)
+
+    def batch_iter(self, train_loader, params, losses, top1, top5):
+        for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader), total=len(train_loader)-1, desc='epoch', leave=False): 
+            # move inputs and targets to GPU
+            if params.use_cuda : 
+                inputs, targets = inputs.cuda(), targets.cuda()
+            inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
+            
+            # train model
+            loss, prec1, prec5 = self.train(model, criterion, optimiser, inputs, targets)
+            
+            losses.update(loss) 
+            top1.update(prec1) 
+            top5.update(prec5)
+    
+
     
     def train_network(self, params, tbx_writer, checkpointer, train_loader, test_loader, model, criterion, optimiser, inferer) :  
         print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5')
@@ -54,19 +70,8 @@ class Trainer(object):
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
             
-            for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader), total=len(train_loader)-1, desc='epoch', leave=False): 
-                # move inputs and targets to GPU
-                if params.use_cuda : 
-                    inputs, targets = inputs.cuda(), targets.cuda()
-                inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
-                
-                # train model
-                loss, prec1, prec5 = self.train(model, criterion, optimiser, inputs, targets)
-                
-                losses.update(loss) 
-                top1.update(prec1) 
-                top5.update(prec5)
-    
+            batch_iter(train_loader, params, losses, top1, top5)
+            
             params.train_loss = losses.avg        
             params.train_top1 = top1.avg        
             params.train_top5 = top5.avg        
