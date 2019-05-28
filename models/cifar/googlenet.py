@@ -323,7 +323,7 @@ class GoogLeNet(nn.Module):
         self.b5_b4_relu0 = nn.ReLU(True)
         
         self.avgpool = nn.AvgPool2d(8, stride=1)
-        self.linear = nn.Linear(1024, 10)
+        self.linear = nn.Linear(1024, num_classes)
 
     def forward(self, x):
         # pre_layers
