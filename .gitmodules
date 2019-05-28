@@ -4,3 +4,6 @@
 [submodule "src/muppet"]
 	path = src/muppet
 	url = git@github.com:adityarajagopal/muppet.git
+[submodule "src/ar4414/nas"]
+	path = src/ar4414/nas
+	url = git@github.com:adityarajagopal/nas.git
