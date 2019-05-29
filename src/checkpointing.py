@@ -20,8 +20,7 @@ class Checkpointer(object) :
         cp_filename = cp_file.split('/')[-1]
         epoch = cp_filename[:cp_filename.index('-')]
         dir_list = os.listdir(new_dir)
-        dir_list.remove('log.csv')
-        dir_list = [int(x[:x.index('-')]) for x in dir_list]
+        dir_list = [int(x[:x.index('-')]) for x in dir_list if x[0].isdigit()]
         dir_list.sort()
         if int(epoch) != dir_list[-1] : 
             raise ValueError('Resume epoch ({}) is not last epoch run ({}). If you want to run from here, use branch instead of resume'.format(epoch, dir_list[-1]))
@@ -143,6 +142,10 @@ class Checkpointer(object) :
         
         # if resume, load from old state completely, ignore parameters in config file
         if params.resume == True : 
+            # ensure path to pretrained has new path and new state know it is in resume 
+            prev_state_dict['pretrained'] = params.pretrained
+            prev_state_dict['resume'] = True
+            
             params.__dict__.update(**prev_state_dict)
             
             # update new start epoch as epoch after the epoch that was resumed from
