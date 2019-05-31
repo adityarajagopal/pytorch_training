@@ -121,7 +121,7 @@ class Checkpointer(object) :
         # create checkpoints to store
         modelpath = os.path.join(self.root, str(params.curr_epoch) + '-model' + '.pth.tar')
         statepath = os.path.join(self.root, str(params.curr_epoch) + '-state' + '.pth.tar')
-
+        
         # store checkpoints
         torch.save(model_dict, modelpath) 
         torch.save(params.get_state(), statepath)
@@ -138,16 +138,19 @@ class Checkpointer(object) :
         # get state to load from
         if params.resume == True or params.branch == True : 
             file_to_load = params.pretrained.replace('model', 'state')        
-            prev_state_dict = torch.load(file_to_load)
+            device = 'cuda:' + str(params.gpu_id)
+            prev_state_dict = torch.load(file_to_load, map_location=device)
         
         # if resume, load from old state completely, ignore parameters in config file
         if params.resume == True : 
             # ensure path to pretrained has new path and new state know it is in resume 
             prev_state_dict['pretrained'] = params.pretrained
             prev_state_dict['resume'] = True
+            prev_state_dict['gpu_id'] = params.gpu_id
+            prev_state_dict['workers'] = params.workers
             
             params.__dict__.update(**prev_state_dict)
-            
+
             # update new start epoch as epoch after the epoch that was resumed from
             params.start_epoch = prev_state_dict['curr_epoch'] + 1
 
