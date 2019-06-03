@@ -28,6 +28,7 @@ class Params() :
         self.weight_decay = config_file.getfloat('training_hyperparameters', 'weight_decay') 
         self.mo_schedule = [self.__to_num(i) for i in config_file.get('training_hyperparameters', 'momentum_schedule').split()]
         self.lr_schedule = [self.__to_num(i) for i in config_file.get('training_hyperparameters', 'lr_schedule').split()]
+        self.trainValSplit = config_file.getfloat('training_hyperparameters', 'train_val_split')
         
         self.sub_classes = config_file.get('pruning_hyperparameters', 'sub_classes').split() 
 
