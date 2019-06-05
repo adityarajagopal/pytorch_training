@@ -59,7 +59,7 @@ class Trainer(object):
     
 
     
-    def train_network(self, params, tbx_writer, checkpointer, train_loader, test_loader, model, criterion, optimiser, inferer) :  
+    def train_network(self, params, tbx_writer, checkpointer, train_loader, test_loader, valLoader, model, criterion, optimiser, inferer):  
         print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5')
         
         for epoch in tqdm(range(params.start_epoch, params.epochs), desc='training', leave=False) : 
@@ -78,10 +78,11 @@ class Trainer(object):
     
             # get test loss
             params.test_loss, params.test_top1, params.test_top5 = inferer.test_network(params, test_loader, model, criterion, optimiser)
+            params.val_loss, params.val_top1, params.val_top5 = inferer.test_network(params, valLoader, model, criterion, optimiser)
             
             checkpointer.save_checkpoint(model.state_dict(), optimiser.state_dict(), params)
             
-            tqdm.write('{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(epoch, params.lr, params.train_loss, params.train_top1, params.train_top5, params.test_loss, params.test_top1, params.test_top5))
+            tqdm.write('{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(epoch, params.lr, params.train_loss, params.train_top1, params.train_top5, params.test_loss, params.test_top1, params.test_top5, params.val_loss, params.val_top1, params.val_top5))
 
 
 

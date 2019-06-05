@@ -25,11 +25,11 @@ class Preproc(object):
     
         # CIFAR10
         if dataset == 'cifar10': 
-            (train_loader, test_loader) = self.cifar10(data_loc, workers, params)
+            (train_loader, test_loader) = self.cifar(data_loc, workers, params, 10)
     
         # CIFAR100
         elif dataset == 'cifar100': 
-            (train_loader, valLoader, test_loader) = self.cifar100(data_loc, workers, params)
+            (train_loader, valLoader, test_loader) = self.cifar(data_loc, workers, params, 100)
         
         # ImageNet
         else : 
@@ -46,6 +46,7 @@ class Preproc(object):
         return indices
     
     def create_subclass_dataset(self, dataset, coarseClasses=[]): 
+        assert dataset != 'cifar10', 'No subclasses for cifar10'
         if dataset == 'cifar100' : 
             # extract the images for those classes
             YLabels = [self.coarseYNames.index(y) for y in coarseClasses] 
@@ -148,18 +149,21 @@ class Preproc(object):
         
         return (train_loader, test_loader)
 
-    def cifar100(self, data_loc, workers, params):
+    def cifar(self, data_loc, workers, params, cifarIndex):
         # data_loc = '/home/ar4414/multipres_training/organised/data'
-        data_loader = torchvision.datasets.CIFAR100
+        if cifarIndex == 100:
+            data_loader = torchvision.datasets.CIFAR100
+        elif cifarIndex == 10:
+            data_loader = torchvision.datasets.CIFAR10
+
         self.extract_cifar_data(params.dataset, data_loc)
+
         if params.sub_classes != []: 
             print('Generating subset of dataset with classes %s' % params.sub_classes)
             train_indices, test_indices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
         else:
             train_indices = None
             test_indices = None
-
-        num_classes = 100
         
         train_transform = torchvision.transforms.Compose([
             torchvision.transforms.RandomCrop(32, padding=4),
@@ -179,28 +183,3 @@ class Preproc(object):
         train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
         
         return train_loader, val_loader, test_loader
-
-    def cifar10(self, data_loc, workers, params):
-        # data_loc = '/home/ar4414/multipres_training/organised/data'
-        data_loader = torchvision.datasets.CIFAR10
-        num_classes = 10 
-        
-        train_transform = torchvision.transforms.Compose([
-            torchvision.transforms.RandomCrop(32, padding=4),
-            torchvision.transforms.RandomHorizontalFlip(),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-    
-        test_transform = torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-    
-        train_set = data_loader(root=data_loc, train=True, download=False, transform=train_transform)
-        test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
-        
-        train_loader = torch.utils.data.DataLoader(train_set, batch_size=params.train_batch, shuffle=True, num_workers=workers)
-        test_loader = torch.utils.data.DataLoader(test_set, batch_size=params.test_batch, shuffle=False, num_workers=workers)
-        
-        return (train_loader, test_loader)
