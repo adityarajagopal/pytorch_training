@@ -35,7 +35,8 @@ class Checkpointer(object) :
         self.logfile = os.path.join(new_dir, 'log.csv')
         
         f = open(self.logfile, 'w+')
-        f.write('Epoch,\tLR,\tLoss_Train,\tTop1_Train,\tTop5_Train,\tLoss_Test,\tTop1_Test,\tTop5_Test\n')
+        # f.write('Epoch,\tLR,\tLoss_Train,\tTop1_Train,\tTop5_Train,\tLoss_Test,\tTop1_Test,\tTop5_Test\n')
+        f.write('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5,\tVal_Loss,\tVal_Top1,\tVal_Top5\n')
         f.close()
 
     def __create_copy_log(self, new_root, old_root, prev_epoch) : 
@@ -115,7 +116,7 @@ class Checkpointer(object) :
 
         # write to log file
         with open(self.logfile, 'a') as f :
-            line = str(params.curr_epoch) + ',\t' + str(params.lr) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + ',\t' + str(params.test_loss.item()) + ',\t' + str(params.test_top1.item()) + ',\t' + str(params.test_top5.item()) + '\n'
+            line = str(params.curr_epoch) + ',\t' + str(params.lr) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + ',\t' + str(params.test_loss.item()) + ',\t' + str(params.test_top1.item()) + ',\t' + str(params.test_top5.item()) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + '\n'
             f.write(line)
 
         # create checkpoints to store

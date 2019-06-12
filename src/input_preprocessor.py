@@ -25,7 +25,7 @@ class Preproc(object):
     
         # CIFAR10
         if dataset == 'cifar10': 
-            (train_loader, test_loader) = self.cifar(data_loc, workers, params, 10)
+            (train_loader, valLoader, test_loader) = self.cifar(data_loc, workers, params, 10)
     
         # CIFAR100
         elif dataset == 'cifar100': 
@@ -178,6 +178,8 @@ class Preproc(object):
         ])
         
         train_set = data_loader(root=data_loc, train=True, download=False, transform=train_transform)
+        if cifarIndex == 10:
+            self.trainFineY = [targets for index, (inputs, targets) in enumerate(train_set)]
         test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
 
         train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
