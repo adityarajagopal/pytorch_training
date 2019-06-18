@@ -10,3 +10,6 @@
 [submodule "src/ar4414/pruning"]
 	path = src/ar4414/pruning
 	url = git@github.com:adityarajagopal/pruning.git
+[submodule "src/dav114/batch_var"]
+	path = src/dav114/batch_var
+	url = git@github.com:DiederikVink/batch_var.git
