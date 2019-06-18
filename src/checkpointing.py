@@ -116,7 +116,7 @@ class Checkpointer(object) :
 
         # write to log file
         with open(self.logfile, 'a') as f :
-            line = str(params.curr_epoch) + ',\t' + str(params.lr) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + ',\t' + str(params.test_loss.item()) + ',\t' + str(params.test_top1.item()) + ',\t' + str(params.test_top5.item()) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + '\n'
+            line = str(params.curr_epoch) + ',\t' + str(params.lr) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + ',\t' + str(params.test_loss.item()) + ',\t' + str(params.test_top1.item()) + ',\t' + str(params.test_top5.item()) + ',\t' + str(params.val_loss.item()) + ',\t' + str(params.val_top1.item()) + ',\t' + str(params.val_top5.item()) + '\n'
             f.write(line)
 
         # create checkpoints to store
