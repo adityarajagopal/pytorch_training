@@ -1,6 +1,8 @@
 import os
 import random
 import sys
+import argparse
+import getpass
 
 # set python path so it points to directory that src is in
 parentDir = os.path.split(os.getcwd())
@@ -12,22 +14,10 @@ sys.path.append(parentDir[0])
 
 import src.app as applic
 
-import src.param_parser as pp
-import src.input_preprocessor as preproc
-import src.model_creator as mc
-import src.training as training
-import src.inference as inference
-import src.utils as utils
-from src.checkpointing import Checkpointer
-
 import tensorboardX as tbx
 
 import torch
 import torch.cuda
-
-import argparse
-
-import getpass
 
 def parse_command_line_args() : 
     parser = argparse.ArgumentParser(description='PyTorch Pruning')
