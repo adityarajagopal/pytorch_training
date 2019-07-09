@@ -16,6 +16,11 @@ class Checkpointer(object) :
         else : 
             self.created_dir = False
 
+        self.headers = ['Epoch','LR','Train_Loss',\
+                        'Train_Top1','Train_Top5','Test_Loss',\
+                        'Test_Top1','Test_Top5','Val_Loss',\
+                        'Val_Top1','Val_Top5']
+        
     def __ensure_last_epoch(self, cp_file, new_dir) : 
         cp_filename = cp_file.split('/')[-1]
         epoch = cp_filename[:cp_filename.index('-')]
@@ -34,9 +39,9 @@ class Checkpointer(object) :
     def __create_log(self, new_dir) :
         self.logfile = os.path.join(new_dir, 'log.csv')
         
+        line = ',\t'.join(self.headers) + '\n'
         f = open(self.logfile, 'w+')
-        # f.write('Epoch,\tLR,\tLoss_Train,\tTop1_Train,\tTop5_Train,\tLoss_Test,\tTop1_Test,\tTop5_Test\n')
-        f.write('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5,\tVal_Loss,\tVal_Top1,\tVal_Top5\n')
+        f.write(line)
         f.close()
 
     def __create_copy_log(self, new_root, old_root, prev_epoch) : 
@@ -99,7 +104,14 @@ class Checkpointer(object) :
             timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
             new_dir = os.path.join(params.checkpoint, params.test_name, timeStamp, 'orig')
             return new_dir
-      
+    
+    def setup_values(self, params):
+        self.values = [params.curr_epoch, params.lr, params.train_loss.item(), \
+                       params.train_top1.item(), params.train_top5.item(), params.test_loss.item(), \
+                       params.test_top1.item(), params.test_top5.item(), params.val_loss.item(), \
+                       params.val_top1.item(), params.val_top5.item()]
+
+
     # def save_checkpoint(self, model_dict, optimiser_dict, internal_state_dict) : 
     def save_checkpoint(self, model_dict, optimiser_dict, params) : 
         if params.printOnly == True:
@@ -115,8 +127,11 @@ class Checkpointer(object) :
         subprocess.check_call(cmd, shell=True)         
 
         # write to log file
+        self.setup_values(params)
+        line = [str(x) for x in self.values]
+        line = ',\t'.join(line)
+        line += '\n'
         with open(self.logfile, 'a') as f :
-            line = str(params.curr_epoch) + ',\t' + str(params.lr) + ',\t' + str(params.train_loss.item()) + ',\t' + str(params.train_top1.item()) + ',\t' + str(params.train_top5.item()) + ',\t' + str(params.test_loss.item()) + ',\t' + str(params.test_top1.item()) + ',\t' + str(params.test_top5.item()) + ',\t' + str(params.val_loss.item()) + ',\t' + str(params.val_top1.item()) + ',\t' + str(params.val_top5.item()) + '\n'
             f.write(line)
 
         # create checkpoints to store
