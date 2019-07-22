@@ -9,6 +9,7 @@ import numpy as np
 import pickle
 import os
 import sys
+import csv
 
 class Preproc(object):
     
@@ -33,7 +34,7 @@ class Preproc(object):
         
         # ImageNet
         else : 
-            (train_loader, test_loader) = self.imageNet(data_loc, workers, params)
+            (train_loader, valLoader, test_loader) = self.imageNet(data_loc, workers, params)
     
         return (train_loader, valLoader, test_loader)
     
@@ -94,7 +95,6 @@ class Preproc(object):
         fineY = [self.trainFineY[i] for i in trainIndices]
         uniqueClasses = set(fineY)
         dist = {k:[trainIndices[i] for i,y in enumerate(fineY) if y == k] for k in uniqueClasses}
-        
         numTrain = int(params.trainValSplit * len(next(iter(dist.values()))))
         trainIndices = []
         valIndices = []
@@ -109,45 +109,66 @@ class Preproc(object):
         if testIndices is None:
             testIndices = list(range(len(testSet)))
 
-        trainIndices, valIndices = self.get_validation_set(params, trainIndices)
+        if 'cifar' in params.dataset:
+            trainIndices, valIndices = self.get_validation_set(params, trainIndices)
+        else:
+            # case of imagenet
+            trainIndFileName = 'trainIndices_' + str(params.trainValSplit).replace('.','_') + '.csv'
+            valIndFileName = 'valIndices_' + str(params.trainValSplit).replace('.','_') + '.csv'
+            trainIndFile = os.path.join(params.data_location, trainIndFileName)
+            valIndFile = os.path.join(params.data_location, valIndFileName)
 
+            with open(trainIndFile, 'r') as csvFile:
+                csvReader = csv.reader(csvFile, delimiter=',')
+                trainIndices = next(csvReader)
+                trainIndices = [int(x) for x in trainIndices]
+            
+            with open(valIndFile, 'r') as csvFile:
+                csvReader = csv.reader(csvFile, delimiter=',')
+                valIndices = next(csvReader)
+                valIndices = [int(x) for x in valIndices]
+            
+            testIndices = list(range(len(testSet)))
+        
         trainLoader = torch.utils.data.DataLoader(trainSet, batch_size=params.train_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices))
         valLoader = torch.utils.data.DataLoader(trainSet, batch_size=params.test_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(valIndices))
         testLoader = torch.utils.data.DataLoader(testSet, batch_size=params.test_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(testIndices))
 
         return trainLoader, valLoader, testLoader        
 
-    def imageNet(self, data_loc, workers, params):
+    def imageNet(self, dataLoc, workers, params):
         # data_loc = '/mnt/storage/imagenet_original/data'
-        if params.sub_classes != [] : 
-            data_loc = self.create_subclass_dataset(params.dataset, data_loc, params.sub_classes) 
-        # train_dir = os.path.join('/mnt/storage/imagenet_original/data', 'train')
-        # test_dir = os.path.join('/mnt/storage/imagenet_original/data', 'validation')
-        train_dir = os.path.join(data_loc, 'train')
-        test_dir = os.path.join(data_loc, 'validation')
-        num_classes = 1000
+        if params.sub_classes != []: 
+            print('Generating subset of dataset with classes %s' % params.sub_classes)
+            trainIndices, testIndices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
+        else:
+            trainIndices = None
+            testIndices = None
+        
+        trainDir = os.path.join(dataLoc, 'train')
+        testDir = os.path.join(dataLoc, 'validation')
+        numClasses = 1000
             
-        train_transform = torchvision.transforms.Compose([
+        trainTransform = torchvision.transforms.Compose([
                 torchvision.transforms.RandomResizedCrop(224),
                 torchvision.transforms.RandomHorizontalFlip(),
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
         ])
             
-        test_transform = torchvision.transforms.Compose([
+        testTransform = torchvision.transforms.Compose([
                 torchvision.transforms.Resize(256),
                 torchvision.transforms.CenterCrop(224),
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
         ])
         
-        train_set = torchvision.datasets.ImageFolder(train_dir, train_transform)
-        test_set = torchvision.datasets.ImageFolder(test_dir, test_transform)
-        
-        train_loader = torch.utils.data.DataLoader(train_set, batch_size=params.train_batch, shuffle=True, num_workers=workers)
-        test_loader = torch.utils.data.DataLoader(test_set, batch_size=params.test_batch, shuffle=False, num_workers=workers)
-        
-        return (train_loader, test_loader)
+        trainSet = torchvision.datasets.ImageFolder(trainDir, trainTransform)
+        testSet = torchvision.datasets.ImageFolder(testDir, testTransform)
+
+        trainLoader, valLoader, testLoader = self.get_loaders(params, trainSet, testSet, trainIndices, testIndices)
+
+        return (trainLoader, valLoader, testLoader)
 
     def cifar(self, data_loc, workers, params, cifarIndex):
         # data_loc = '/home/ar4414/multipres_training/organised/data'

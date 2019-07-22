@@ -14,9 +14,9 @@ class Inferer(object):
         for batch_idx, (inputs, targets) in tqdm(enumerate(test_loader), total=len(test_loader)-1, desc='inference', leave=False) : 
             # move inputs and targets to GPU
             with torch.no_grad():
+                device = 'cuda:' + str(params.gpuList[0])
                 if params.use_cuda : 
-                    inputs, targets = inputs.cuda(), targets.cuda()
-                inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
+                    inputs, targets = inputs.cuda(device, non_blocking=True), targets.cuda(device, non_blocking=True)
                 
                 # perform inference 
                 outputs = model(inputs) 
@@ -24,9 +24,9 @@ class Inferer(object):
             
             prec1, prec5 = utils.accuracy(outputs.data, targets.data)
     
-            losses.update(loss) 
-            top1.update(prec1) 
-            top5.update(prec5)
+            losses.update(loss.item()) 
+            top1.update(prec1.item()) 
+            top5.update(prec5.item())
     
         if params.evaluate == True : 
             tqdm.write('Loss: {}, Top1: {}, Top5: {}'.format(losses.avg, top1.avg, top5.avg))
