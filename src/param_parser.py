@@ -42,7 +42,9 @@ class Params() :
         self.branch = config_file.getboolean('pytorch_parameters', 'branch')
         self.evaluate = config_file.getboolean('pytorch_parameters', 'evaluate')
         self.tee_printing = config_file.get('pytorch_parameters', 'tee_printing')
-        self.enableTbx = config_file.getboolean('pytorch_parameters', 'enable_tbx')
+        self.enableTbx = config_file.getboolean('pytorch_parameters', 'enable_tbx', fallback=False)
+        
+        self.gpuList = [int(x) for x in self.gpu_id.split(',')]
 
         # attributes used internally
         self.use_cuda = True

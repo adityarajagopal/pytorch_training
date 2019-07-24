@@ -176,7 +176,6 @@ class Preproc(object):
             data_loader = torchvision.datasets.CIFAR100
         elif cifarIndex == 10:
             data_loader = torchvision.datasets.CIFAR10
-
         self.extract_cifar_data(params.dataset, data_loc)
 
         if params.sub_classes != []: 
