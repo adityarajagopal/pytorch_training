@@ -106,10 +106,10 @@ class Checkpointer(object) :
             return new_dir
     
     def setup_values(self, params):
-        self.values = [params.curr_epoch, params.lr, params.train_loss.item(), \
-                       params.train_top1.item(), params.train_top5.item(), params.test_loss.item(), \
-                       params.test_top1.item(), params.test_top5.item(), params.val_loss.item(), \
-                       params.val_top1.item(), params.val_top5.item()]
+        self.values = [params.curr_epoch, params.lr, params.train_loss, \
+                       params.train_top1, params.train_top5, params.test_loss, \
+                       params.test_top1, params.test_top5, params.val_loss, \
+                       params.val_top1, params.val_top5]
 
 
     # def save_checkpoint(self, model_dict, optimiser_dict, internal_state_dict) : 
