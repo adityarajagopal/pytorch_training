@@ -60,6 +60,8 @@ class Checkpointer(object) :
     
     def __get_root_dir(self, params) : 
         assert not (params.branch == True and params.resume == True), 'Cannot branch and resume at the same time. Check config file.'
+        if params.printOnly:
+            return ''
 
         # if branch, create new branch directory
         if params.branch == True : 
@@ -164,6 +166,7 @@ class Checkpointer(object) :
             prev_state_dict['resume'] = True
             prev_state_dict['gpu_id'] = params.gpu_id
             prev_state_dict['workers'] = params.workers
+            prev_state_dict['printOnly'] = params.printOnly
             
             params.__dict__.update(**prev_state_dict)
 
@@ -178,11 +181,12 @@ class Checkpointer(object) :
             old_root_list = params.pretrained.split('/')
             old_root = os.path.join('/', *old_root_list[:-1])
             
-            self.__create_dir(self.root)
-            self.__create_copy_log(self.root, old_root, prev_epoch)
+            if not params.printOnly:
+                self.__create_dir(self.root)
+                self.__create_copy_log(self.root, old_root, prev_epoch)
             
-            cmd = 'cp ' + os.path.join(old_root, prev_epoch + '-*') + ' ' + self.root           
-            subprocess.check_call(cmd, shell=True)
+                cmd = 'cp ' + os.path.join(old_root, prev_epoch + '-*') + ' ' + self.root           
+                subprocess.check_call(cmd, shell=True)
 
             params.start_epoch = prev_state_dict['curr_epoch'] + 1
 

@@ -10,11 +10,11 @@ class Params() :
         self.data_location = config_file.get('dataset', 'dataset_location')
 
         self.arch = config_file.get('cnn', 'architecture')        
-        self.depth = config_file.get('cnn', 'depth')       
-        self.cardinality = config_file.get('cnn', 'cardinality')
-        self.widen_factor = config_file.get('cnn', 'widen_factor')
-        self.growth_rate = config_file.get('cnn', 'growth_rate')
-        self.compression_rate = config_file.get('cnn', 'compression_rate')
+        self.depth = config_file.getint('cnn', 'depth')       
+        self.cardinality = config_file.getint('cnn', 'cardinality')
+        self.widen_factor = config_file.getint('cnn', 'widen_factor')
+        self.growth_rate = config_file.getint('cnn', 'growth_rate')
+        self.compression_rate = config_file.getint('cnn', 'compression_rate')
 
         # self.start_epoch = config_file.getint('training_hyperparameters', 'start_epoch')
         self.printOnly = config_file.getboolean('training_hyperparameters', 'print_only')
