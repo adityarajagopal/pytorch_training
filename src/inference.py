@@ -1,5 +1,7 @@
 import torch.autograd
 from tqdm import tqdm
+import sys
+import math
 
 import src.utils as utils
 
@@ -30,4 +32,5 @@ class Inferer(object):
     
         if params.evaluate == True : 
             tqdm.write('Loss: {}, Top1: {}, Top5: {}'.format(losses.avg, top1.avg, top5.avg))
+        
         return (losses.avg, top1.avg, top5.avg)

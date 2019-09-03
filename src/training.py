@@ -59,7 +59,7 @@ class Trainer(object):
     
 
     
-    def train_network(self, params, tbx_writer, checkpointer, train_loader, test_loader, valLoader, model, criterion, optimiser, inferer):  
+    def train_network(self, params, tbx_writer, checkpointer, train_loader, valLoader, test_loader, model, criterion, optimiser, inferer):  
         print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5,\tVal_Loss,\tVal_Top1,\tVal_Top5')
         
         for epoch in tqdm(range(params.start_epoch, params.epochs), desc='training', leave=False) : 

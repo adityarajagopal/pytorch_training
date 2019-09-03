@@ -53,7 +53,8 @@ class ModelCreator(object):
     
         if params.evaluate == True : 
             checkpoint = torch.load(params.pretrained)
-            model.load_state_dict(checkpoint['state_dict'])
+            # model.load_state_dict(checkpoint['state_dict'])
+            model.load_state_dict(checkpoint)
             
         torch.backends.cudnn.benchmark = True
         print('Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
