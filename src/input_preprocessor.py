@@ -47,34 +47,77 @@ class Preproc(object):
         return indices
     
     def create_subclass_dataset(self, dataset, coarseClasses=[]): 
-        assert dataset != 'cifar10', 'No subclasses for cifar10'
         if dataset == 'cifar100' : 
             # extract the images for those classes
             YLabels = [self.coarseYNames.index(y) for y in coarseClasses] 
             trainIndices = self.extract_subclasses(YLabels, self.trainCoarseY)
             testIndices = self.extract_subclasses(YLabels, self.testCoarseY)
-            
-            return (trainIndices, testIndices)
 
-    def extract_cifar_imgs(self, dataLoc, dataSetType):
+        elif dataset == 'cifar10':
+            YLabels = [self.coarseYNames.index(y) for y in coarseClasses] 
+            trainIndices = self.extract_subclasses(YLabels, self.trainCoarseY)
+            testIndices = self.extract_subclasses(YLabels, self.testCoarseY)
+        
+        return (trainIndices, testIndices)
+
+    def extract_cifar_imgs(self, dataLoc, dataSetType, classes):
         # dataLoc : path to directory which has train, test and meta files
         # dataSetType : string of train / test 
-        with open(os.path.join(dataLoc, dataSetType), mode='rb') as data : 
-            imgs = pickle.load(data, encoding='latin1')        
-        
-        X = imgs['data']
-        fineY = imgs['fine_labels']
-        coarseY = imgs['coarse_labels']
-        fileNames = imgs['filenames']
+        if classes == 100:
+            with open(os.path.join(dataLoc, dataSetType), mode='rb') as data : 
+                imgs = pickle.load(data, encoding='latin1')        
+            
+            X = imgs['data']
+            fineY = imgs['fine_labels']
+            coarseY = imgs['coarse_labels']
+            fileNames = imgs['filenames']
 
-        return imgs, X, fineY, coarseY, fileNames
-    
-    def extract_cifar_meta(self, dataLoc):
-        with open(os.path.join(dataLoc, 'meta'), mode = 'rb') as metaData : 
-            data = pickle.load(metaData, encoding='latin1')
+        elif classes == 10:
+            if dataSetType == 'train':
+                for i in range(1,6):
+                    with open(os.path.join(dataLoc, "data_batch_{}".format(i)), mode='rb') as data : 
+                        imgs = pickle.load(data, encoding='latin1')        
+                    
+                    if i == 1:
+                        X = imgs['data']
+                        fileNames = imgs['filenames']
+                        fineY = imgs['labels']
+                    else:
+                        np.append(X, imgs['data'])
+                        np.append(fileNames, imgs['filenames'])
+                        np.append(fineY, imgs['labels'])
+            else:
+                with open(os.path.join(dataLoc, "test_batch"), mode='rb') as data : 
+                    imgs = pickle.load(data, encoding='latin1')        
+                
+                X = imgs['data']
+                fileNames = imgs['filenames']
+                fineY = imgs['labels']
+
+            coarseY = fineY
+
+        else:
+            raise Exception('Invalid number of classes in "input_preprocessor.py - extract_cifar_imgs')
         
-        fineYNames = data['fine_label_names']
-        coarseYNames = data['coarse_label_names']
+        return imgs, X, fineY, coarseY, fileNames
+
+    
+    def extract_cifar_meta(self, dataLoc, classes):
+        if classes == 100:
+            with open(os.path.join(dataLoc, 'meta'), mode = 'rb') as metaData : 
+                data = pickle.load(metaData, encoding='latin1')
+            
+            fineYNames = data['fine_label_names']
+            coarseYNames = data['coarse_label_names']
+        elif classes == 10:
+            with open(os.path.join(dataLoc, 'batches.meta'), mode = 'rb') as metaData : 
+                data = pickle.load(metaData, encoding='latin1')
+            
+            coarseYNames = data['label_names']
+            fineYNames = coarseYNames            
+
+        else:
+            raise Exception('Invalid number of classes in "input_preprocessor.py - extract_cifar_meta')
 
         return data, fineYNames, coarseYNames
 
@@ -83,13 +126,26 @@ class Preproc(object):
             data_loc = os.path.join(data_loc, 'cifar-100-python')
     
             # training data
-            self.trainingImgs, self.trainX, self.trainFineY, self.trainCoarseY, self.trainFilenames = self.extract_cifar_imgs(data_loc, 'train')
+            self.trainingImgs, self.trainX, self.trainFineY, self.trainCoarseY, self.trainFilenames = self.extract_cifar_imgs(data_loc, 'train', 100)
             
             # test data
-            self.testImgs, self.testX, self.testFineY, self.testCoarseY, self.testFilenames = self.extract_cifar_imgs(data_loc, 'test')
+            self.testImgs, self.testX, self.testFineY, self.testCoarseY, self.testFilenames = self.extract_cifar_imgs(data_loc, 'test', 100)
             
             # meta data
-            self.metaData, self.fineYNames, self.coarseYNames = self.extract_cifar_meta(data_loc)
+            self.metaData, self.fineYNames, self.coarseYNames = self.extract_cifar_meta(data_loc, 100)
+
+        elif dataset == 'cifar10':
+            data_loc = os.path.join(data_loc, 'cifar-10-batches-py')
+    
+            # training data
+            self.trainingImgs, self.trainX, self.trainFineY, self.trainCoarseY, self.trainFilenames = self.extract_cifar_imgs(data_loc, 'train', 10)
+            
+            # test data
+            self.testImgs, self.testX, self.testFineY, self.testCoarseY, self.testFilenames = self.extract_cifar_imgs(data_loc, 'test', 10)
+            
+            # meta data
+            self.metaData, self.fineYNames, self.coarseYNames = self.extract_cifar_meta(data_loc, 10)
+            
 
     def get_validation_set(self, params, trainIndices):
         fineY = [self.trainFineY[i] for i in trainIndices]
@@ -105,31 +161,43 @@ class Preproc(object):
 
     def get_loaders(self, params, trainSet, testSet, trainIndices=None, testIndices=None):
         if trainIndices is None:
-           trainIndices = list(range(len(trainSet)))
+            trainIndices = list(range(len(trainSet)))
         if testIndices is None:
             testIndices = list(range(len(testSet)))
 
-        if 'cifar' in params.dataset:
-            trainIndices, valIndices = self.get_validation_set(params, trainIndices)
-        else:
-            # case of imagenet
+        if ('cifar' in params.dataset) or ('imagenet' in params.dataset):
             trainIndFileName = 'trainIndices_' + str(params.trainValSplit).replace('.','_') + '.csv'
             valIndFileName = 'valIndices_' + str(params.trainValSplit).replace('.','_') + '.csv'
-            trainIndFile = os.path.join(params.data_location, trainIndFileName)
-            valIndFile = os.path.join(params.data_location, valIndFileName)
+
+            if 'cifar10' in params.dataset:
+                trainIndFile = os.path.join(params.data_location, 'cifar-10-batches-py', trainIndFileName)
+                valIndFile = os.path.join(params.data_location, 'cifar-10-batches-py', valIndFileName)
+            elif 'cifar100' in params.dataset:
+                trainIndFile = os.path.join(params.data_location, 'cifar-100-python', trainIndFileName)
+                valIndFile = os.path.join(params.data_location, 'cifar-100-python', valIndFileName)
+            else:
+                # case of imagenet
+                trainIndFile = os.path.join(params.data_location, trainIndFileName)
+                valIndFile = os.path.join(params.data_location, valIndFileName)
 
             with open(trainIndFile, 'r') as csvFile:
                 csvReader = csv.reader(csvFile, delimiter=',')
                 trainIndices = next(csvReader)
                 trainIndices = [int(x) for x in trainIndices]
+                self.trainIndices = trainIndices
             
             with open(valIndFile, 'r') as csvFile:
                 csvReader = csv.reader(csvFile, delimiter=',')
                 valIndices = next(csvReader)
                 valIndices = [int(x) for x in valIndices]
+                self.valIndices = valIndices
             
-            testIndices = list(range(len(testSet)))
-        
+            # testIndices = list(range(len(testSet)))
+            # self.testIndices = testIndices
+        else:
+            self.trainIndices, self.valIndices = self.get_validation_set(params, trainIndices)
+        self.testIndices = testIndices
+
         trainLoader = torch.utils.data.DataLoader(trainSet, batch_size=params.train_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices))
         valLoader = torch.utils.data.DataLoader(trainSet, batch_size=params.test_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(valIndices))
         testLoader = torch.utils.data.DataLoader(testSet, batch_size=params.test_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(testIndices))
@@ -181,10 +249,13 @@ class Preproc(object):
         if params.sub_classes != []: 
             print('Generating subset of dataset with classes %s' % params.sub_classes)
             train_indices, test_indices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
+            # with open("{}.csv".format(params.sub_classes[0]), 'w') as writeFile:
+            #     writer = csv.writer(writeFile)
+            #     writer.writerows([train_indices])
         else:
             train_indices = None
             test_indices = None
-        
+
         train_transform = torchvision.transforms.Compose([
             torchvision.transforms.RandomCrop(32, padding=4),
             torchvision.transforms.RandomHorizontalFlip(),
