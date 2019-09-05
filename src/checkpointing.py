@@ -156,7 +156,7 @@ class Checkpointer(object) :
         # get state to load from
         if params.resume == True or params.branch == True : 
             file_to_load = params.pretrained.replace('model', 'state')        
-            device = 'cuda:' + str(params.gpu_id)
+            device = 'cuda:' + str(params.gpuList[0])
             prev_state_dict = torch.load(file_to_load, map_location=device)
         
         # if resume, load from old state completely, ignore parameters in config file
@@ -165,6 +165,7 @@ class Checkpointer(object) :
             prev_state_dict['pretrained'] = params.pretrained
             prev_state_dict['resume'] = True
             prev_state_dict['gpu_id'] = params.gpu_id
+            prev_state_dict['gpuList'] = [int(x) for x in params.gpu_id.split(',')]
             prev_state_dict['workers'] = params.workers
             prev_state_dict['printOnly'] = params.printOnly
             
