@@ -1,6 +1,9 @@
 [submodule "src/dav114/importance_sampling"]
 	path = src/dav114/importance_sampling
 	url = git@github.com:DiederikVink/importance_sampling.git
+[submodule "src/dav114/batch_var"]
+	path = src/dav114/batch_var
+	url = git@github.com:DiederikVink/batch_var.git
 [submodule "src/muppet"]
 	path = src/muppet
 	url = git@github.com:adityarajagopal/muppet.git
@@ -10,6 +13,6 @@
 [submodule "src/ar4414/pruning"]
 	path = src/ar4414/pruning
 	url = git@github.com:adityarajagopal/pruning.git
-[submodule "src/dav114/batch_var"]
-	path = src/dav114/batch_var
-	url = git@github.com:DiederikVink/batch_var.git
+[submodule "src/dav114/hamming_distance_training"]
+	path = src/dav114/hamming_distance_training
+	url = git@github.com:DiederikVink/hamming_distance_training.git
