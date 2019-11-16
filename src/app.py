@@ -97,6 +97,10 @@ class Application(object):
         print('==> Setting up random number seed')
         if self.params.manual_seed is None or self.params.manual_seed < 0 : 
             self.params.manual_seed = random.randint(1, 10000)
+        else:
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
         random.seed(self.params.manual_seed) 
         torch.manual_seed(self.params.manual_seed)
         if self.params.use_cuda : 

@@ -16,3 +16,9 @@
 [submodule "src/dav114/hamming_distance_training"]
 	path = src/dav114/hamming_distance_training
 	url = git@github.com:DiederikVink/hamming_distance_training.git
+[submodule "src/dav114/metric_train"]
+	path = src/dav114/metric_train
+	url = git@github.com:DiederikVink/metric_train.git
+[submodule "src/dav114/quant"]
+	path = src/dav114/quant
+	url = git@github.com:DiederikVink/quant.git
