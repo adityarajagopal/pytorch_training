@@ -22,3 +22,6 @@
 [submodule "src/dav114/quant"]
 	path = src/dav114/quant
 	url = git@github.com:DiederikVink/quant.git
+[submodule "src/dav114/predict_g"]
+	path = src/dav114/predict_g
+	url = git@github.com:DiederikVink/predict_g.git
