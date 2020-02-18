@@ -6,13 +6,13 @@ pytorch\_training.yml
 =======================
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
 
-main
+main_template.py
 ====
 Contains main function that can is used to call functions in the rest of the files 
 
 param\_parser
 ==================
-Reads the config file present in the configs folder that holds the configuration and returns an object with all the parameters that were passed in. The config file to be used can be specified as `python3 main.py --config-file "name of config file"` when calling the function. 
+Reads the config file present in the configs folder that holds the configuration and returns an object with all the parameters that were passed in. The config file to be used can be specified as `python3 main_template.py --config-file "name of config file"` when calling the function. 
 
 config.ini
 ==========
