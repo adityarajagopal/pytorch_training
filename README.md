@@ -6,7 +6,7 @@ pytorch\_training.yml
 =======================
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
 
-main_template.py
+main_template
 ====
 Contains main function that can is used to call functions in the rest of the files 
 
