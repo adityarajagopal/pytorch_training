@@ -1,21 +1,22 @@
 **Training CNNs with Pytorch** 
-------------------------------
+==============================
 This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
+> Note : For all files regarding MuPPET including the main, look in the ./src/muppet directory. 
 
 pytorch\_training.yml
-=======================
+-----------------------
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
 
 main_template
-====
+-------------
 Contains main function that can is used to call functions in the rest of the files 
 
 param\_parser
-==================
+------------------
 Reads the config file present in the configs folder that holds the configuration and returns an object with all the parameters that were passed in. The config file to be used can be specified as `python3 main_template.py --config-file "name of config file"` when calling the function. 
 
 config.ini
-==========
+----------
 > Dataset
 - **Dataset** : Name of dataset that will be recognised by code (one of cifar10/cifar100/imagenet)
 - **Dataset\_Location** : Folder which holds the location of the dataset. This will also depend on how the dataset is being read in the input\_preprocessor.py file
@@ -58,13 +59,13 @@ config.ini
 > *Note*: Only one of **Resume**, **Branch**, or **Evaluate** can be set to True at any given time. Directory structure for checkpointing will be specified in the section describing the checkpointing.py file.
 
 model\_creator
-==============
+--------------
 Looks at the **cnn** section of the config file and loads the model specified in the **models** folder. Within the models folder, the *\_\_init\_\_.py* in the *models/dataset* folder should have the `from .dataset.py import *` command for each model that you wish to use, and within the **dataset.py** file, the *\_\_all\_\_* value needs to be set to the name of the dataset to be imported. 
 
 Refer to ./src/muppet/models/cifar/alexnet.py to see how to include the custom quantisation layers into your model file in order to be able to train other networks with MuPPET. 
 
 checkpointing
-=============
+-------------
 Defines a class that is instantiated in the **main** which holds the state during training as well as deals with checkpointing. 
 Whenever a new test is created, i.e. **Branch**, **Resume** and **Evaluate** are all False, the directory is set to **Checkpoint\_Path/Test\_Name/orig**. In here, after every epoch, two files are stored with the names *(epoch\_number)-model.pth.tar* and *(epoch\_number)-state.pth.tar*. 
 
