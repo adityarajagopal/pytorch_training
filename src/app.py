@@ -11,7 +11,7 @@ import sys
 
 import configparser as cp
 
-import tensorboardX as tbx
+# import tensorboardX as tbx
 
 import torch
 import torch.cuda
@@ -28,23 +28,24 @@ class Application(object):
         self.setup_tee_printing()
         
         # setup tensorboardX and checkpointer  
-        if self.params.enableTbx: 
-            self.tbx_writer = tbx.SummaryWriter(comment='-test-1')
-        else:
-            self.tbx_writer = None
+        # if self.params.enableTbx: 
+        #     self.tbx_writer = tbx.SummaryWriter(comment='-test-1')
+        # else:
+        #     self.tbx_writer = None
 
         if self.params.evaluate == False : 
             self.run_training()
         else : 
             self.run_inference()
 
-        if self.params.enableTbx:
-            self.tbx_writer.close()
+        # if self.params.enableTbx:
+        #     self.tbx_writer.close()
+        self.tbx_writer = None
 
     def run_training(self):
         # train model 
         print('==> Performing Training')
-        self.trainer.train_network(self.params, self.tbx_writer, self.checkpointer, self.train_loader, self.valLoader, self.test_loader, self.model, self.criterion, self.optimiser, self.inferer) 
+        self.trainer.train_network(self.params, None, self.checkpointer, self.train_loader, self.valLoader, self.test_loader, self.model, self.criterion, self.optimiser, self.inferer) 
 
     def run_inference(self):
         # perform inference only

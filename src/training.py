@@ -82,8 +82,8 @@ class Trainer(object):
             params.train_top5 = top5.avg        
     
             # get test loss
-            params.test_loss, params.test_top1, params.test_top5 = inferer.test_network(params, test_loader, model, criterion, optimiser)
-            params.val_loss, params.val_top1, params.val_top5 = inferer.test_network(params, valLoader, model, criterion, optimiser)
+            params.test_loss, params.test_top1, params.test_top5 = inferer.test_network(params, test_loader, model, criterion, optimiser, verbose=False)
+            params.val_loss, params.val_top1, params.val_top5 = inferer.test_network(params, valLoader, model, criterion, optimiser, verbose=False)
             
             checkpointer.save_checkpoint(model.state_dict(), optimiser.state_dict(), params)
             

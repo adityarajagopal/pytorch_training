@@ -1,10 +1,8 @@
 **Training CNNs with Pytorch** 
 ------------------------------
-This repository provides a modular base to train CNNs using Pytorch. It has integration with [TensorboardX](https://github.com/lanpa/tensorboardX) which allows Tensorboard style visualisations while having the rest of the code remain in pythonic Pytorch.  
+This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
 
-The list of files in the directory and their functions are described below. 
-
-pytorch\_tensorflow.yml
+pytorch\_training.yml
 =======================
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
 
@@ -19,29 +17,51 @@ Reads the config file present in the configs folder that holds the configuration
 config.ini
 ==========
 > Dataset
-- **Dataset** : Name of dataset that will be recognised by code
-- **Dataset\_Location** : Folder which holds the location of the dataset. This will also depend on how the dataset is being read in the input\_preprocess.py file
+- **Dataset** : Name of dataset that will be recognised by code (one of cifar10/cifar100/imagenet)
+- **Dataset\_Location** : Folder which holds the location of the dataset. This will also depend on how the dataset is being read in the input\_preprocessor.py file
+
 > CNN
-- **Architecture** : Name of the CNN being trained as recognised by code in the model\_creator.py file 
+- **Architecture** : Name of the CNN being trained as recognised by code in the model\_creator.py file
+- **Depth** : Relevant only for ResNet architectures
 - Various other architecture related parameters that may or may not be relevant depending on parsing in the model\_creator.py file
+
 > Training\_Hyperparameters
-- Most training\_hyperparameters are self explanatory 
+- **Print\_Only** : Set to True will only print training progress to the terminal and will not create any log files 
+- **Train(Test)\_Batch** : Batch sizes for training or test
+- **Min_LR** : Minimum learning rate for training
+- **LR(Momentum)\_Schedule** : Schedule for LR / Momentum. Follows pattern <epoch> <lr> <epoch> <lr> ... If <lr> is -1 the current learning rate is multiplied by **Gamma**, otherwise value of <lr> is used
+- **Train\_Val\_Split** : Percentage of training dataset that is split into the training set. The remaining percentage becomes the validation set
+- Other training\_hyperparameters are self explanatory 
+
 > Pytorch\_Parameters
 - **Manual\_Seed** : Random number generator seed (set in main.py)
 - **Data\_Loading\_Workers** : Pytorch parameter to set number of parallel threads reading in data 
 - **GPU\_ID** : Which GPU to use. If multiple specify with comma separation as 0,1,... 
-- **Checkpoint\_Path** : Used in conjunction with **Test\_Name** if **Resume**, **Branch** and **Evaluate** are all False. If used, it will create a new folder with path "Checkpoint\_Path/Test\_Name" where training log files will be placed 
+- **Checkpoint\_Path** : Used in conjunction with **Test\_Name** if **Resume**, **Branch** and **Evaluate** are all False. If used, it will create a new folder with path "Checkpoint\_Path/Test\_Name" where time-stamped training log files will be placed 
 - **Test\_Name** : Specify name of new training being run, this can be anything
 - **Pretrained** : Used if any one of **Resume**, **Branch**, or **Evaluate** are set to True. This needs to be set as path to a \*-model.pth.tar file that holds the checkpoint from which training needs to continue or evaluation needs to be performed. 
 - **Resume** : If set to True, training will resume from the epoch specified in the checkpoint file in **Pretrained** and the state will be taken in from the checkpointed state. The values for hyperparameters specified in this config file with be ignored. 
 - **Branch** : If set to True, training will fork from the epoch specified in the checkpoint file in **Pretrained** and will continue with the hyperparameters specified in the config file. Previous state that was stored will be ignored. 
 - **Evaluate** : If set to True, inference will be performed on the checkpointed model in **Pretrained**, with hyperparameters specified in this config file. 
 - **Tee\_Printing** : If a csv file is specified here, it overloads the print function in Python such that if the string passed into the print function starts with a **~**, the print function will write both to stdout and to the csv specified here. If left as None, the print function is not overloaded. 
+
+> MuPPET\_Hyperparameters
+- **Run\_Muppet** : If False, all following parameters are ignored and regular training is performed 
+- **Bit\_Width** : Bitwidth at which MuPPET training begins. If FP32, set to -1 
+- **Data\_Type** : One of "DFixed" or "Float". Has to match **Bit\_Width** specified
+- **Round\_Meth** : One of "Simple" or "Stochastic"
+- **Policy\_Resolution** : Refer to resolution hyperparameter in associated paper  
+- **Policy\_Patience** : Refer to patience hyperparameter in associated paper
+- **Fp32\_Epochs\_Per\_Lr** : Number of epochs run at each learning rate once in FP32 training  
+- **Prec\_Schedule** : Precisions to change into at each switch. First precision must match with the value for **Bit\_Width**
+
 > *Note*: Only one of **Resume**, **Branch**, or **Evaluate** can be set to True at any given time. Directory structure for checkpointing will be specified in the section describing the checkpointing.py file.
 
 model\_creator
 ==============
-Looks at the **cnn** section of the config file and loads the model specified in the **models** folder. Within the models folder, the *\_\_init\_\_.py* in the *models/dataset* folder should have the `from .dataset.py import *` command for each model that you wish to use, and within the **dataset.py** file, the *\_\_all\_\_* value needs to be set to the name of the dataset to be imported
+Looks at the **cnn** section of the config file and loads the model specified in the **models** folder. Within the models folder, the *\_\_init\_\_.py* in the *models/dataset* folder should have the `from .dataset.py import *` command for each model that you wish to use, and within the **dataset.py** file, the *\_\_all\_\_* value needs to be set to the name of the dataset to be imported. 
+
+Refer to ./src/muppet/models/cifar/alexnet.py to see how to include the custom quantisation layers into your model file in order to be able to train other networks with MuPPET. 
 
 checkpointing
 =============
@@ -51,12 +71,3 @@ Whenever a new test is created, i.e. **Branch**, **Resume** and **Evaluate** are
 If a **Resume** is called, then whichever directory the *model.pth.tar* file was in, the new checkpoints are placed in that directory itself. The code checks to ensure that the checkpoint file passed to resume from is the last epoch that is stored in that directory. If you wish to resume from a different epoch, a **Branch** command needs to be used. 
 
 If a **Branch** is called, then at the same level as the **orig** directory, a new directory is created with name *(start_epoch_number)-(version)*. So if multiple different branches are created with the same start epoch, the version number is incremented by 1 each time. The checkpoint of the start epoch is copied from the **orig** directory into this new directory, and training is resumed from the following epoch. The relevant files in the old log file are also copied over, so the new logfile within this new directory is complete with history data and new data. 
-
-
-
-
-
-
-
-
-

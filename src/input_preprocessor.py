@@ -10,10 +10,12 @@ import pickle
 import os
 import sys
 import csv
+import json
 
 class Preproc(object):
     
     def import_and_preprocess_dataset(self, params) : 
+        #{{{
         dataset = params.dataset 
         workers = params.workers
         data_loc = params.data_location
@@ -35,16 +37,20 @@ class Preproc(object):
             (train_loader, valLoader, test_loader) = self.imageNet(data_loc, workers, params)
     
         return (train_loader, valLoader, test_loader)
+        #}}}
     
     def extract_subclasses(self, subclasses, Y_coarse) : 
+        #{{{
         indices = []
         
         for sc in subclasses :
             indices += [i for i in range(len(Y_coarse)) if Y_coarse[i] == sc]
         
         return indices
+        #}}}
     
     def create_subclass_dataset(self, dataset, coarseClasses=[]): 
+        #{{{
         if dataset == 'cifar100' : 
             # extract the images for those classes
             YLabels = [self.coarseYNames.index(y) for y in coarseClasses] 
@@ -57,8 +63,10 @@ class Preproc(object):
             testIndices = self.extract_subclasses(YLabels, self.testCoarseY)
         
         return (trainIndices, testIndices)
+        #}}}
 
     def extract_cifar_imgs(self, dataLoc, dataSetType, classes):
+        #{{{
         # dataLoc : path to directory which has train, test and meta files
         # dataSetType : string of train / test 
         if classes == 100:
@@ -98,9 +106,10 @@ class Preproc(object):
             raise Exception('Invalid number of classes in "input_preprocessor.py - extract_cifar_imgs')
         
         return imgs, X, fineY, coarseY, fileNames
-
+        #}}}
     
     def extract_cifar_meta(self, dataLoc, classes):
+        #{{{
         if classes == 100:
             with open(os.path.join(dataLoc, 'meta'), mode = 'rb') as metaData : 
                 data = pickle.load(metaData, encoding='latin1')
@@ -118,8 +127,10 @@ class Preproc(object):
             raise Exception('Invalid number of classes in "input_preprocessor.py - extract_cifar_meta')
 
         return data, fineYNames, coarseYNames
+        #}}}
 
     def extract_cifar_data(self, dataset, data_loc):
+        #{{{
         if dataset == 'cifar100':
             data_loc = os.path.join(data_loc, 'cifar-100-python')
     
@@ -140,12 +151,13 @@ class Preproc(object):
             
             # test data
             self.testImgs, self.testX, self.testFineY, self.testCoarseY, self.testFilenames = self.extract_cifar_imgs(data_loc, 'test', 10)
-            
+           
             # meta data
             self.metaData, self.fineYNames, self.coarseYNames = self.extract_cifar_meta(data_loc, 10)
-            
+        #}}}
 
     def get_validation_set(self, params, trainIndices):
+        #{{{
         fineY = [self.trainFineY[i] for i in trainIndices]
         uniqueClasses = set(fineY)
         dist = {k:[trainIndices[i] for i,y in enumerate(fineY) if y == k] for k in uniqueClasses}
@@ -156,21 +168,72 @@ class Preproc(object):
         [valIndices.extend(v[numTrain:]) for v in dist.values()]
 
         return trainIndices, valIndices
+        #}}}
 
     def get_loaders(self, params, trainSet, testSet, trainIndices=None, testIndices=None):
+    #{{{
         if trainIndices is None:
             trainIndices = list(range(len(trainSet)))
         if testIndices is None:
             testIndices = list(range(len(testSet)))
+        
+        if params.sub_classes != []: 
+        #{{{
+            print('Generating subset of dataset with classes %s' % params.sub_classes)
+            trainIndFileName = 'coarseTrainIndices_' + str(params.trainValSplit).replace('.','_') + '.json'
+            valIndFileName = 'coarseValIndices_' + str(params.trainValSplit).replace('.','_') + '.json'
 
-        if ('cifar' in params.dataset) or ('imagenet' in params.dataset):
+            if params.dataset == 'cifar100':
+                #{{{
+                trainIndFile = os.path.join(params.data_location, 'cifar-100-python', trainIndFileName)
+                valIndFile = os.path.join(params.data_location, 'cifar-100-python', valIndFileName)
+                
+                if not os.path.isfile(trainIndFile) or not os.path.isfile(valIndFile):
+                    #{{{
+                    print('Creating JSON with per coarse class train and val indices')
+                    ccTrain = {cc:[] for cc in self.coarseYNames}
+                    ccVal = {cc:[] for cc in self.coarseYNames}
+                    for sc in self.coarseYNames:
+                        train_indices, test_indices = self.create_subclass_dataset(params.dataset, [sc]) 
+                        train, val = self.get_validation_set(params, train_indices)
+                        ccTrain[sc] = train
+                        ccVal[sc] = val
+                    with open(trainIndFile, 'w') as tFile: 
+                        json.dump(ccTrain, tFile)
+                    with open(valIndFile, 'w') as vFile:
+                        json.dump(ccVal, vFile)
+                    #}}}
+                
+                else:
+                    with open(trainIndFile, 'r') as tF:
+                        ccTrainIndices = json.load(tF)
+                    with open(valIndFile, 'r') as vF:
+                        ccValIndices = json.load(vF)
+                    
+                    trainIndices = []
+                    valIndices = []
+                    for cc in params.sub_classes:
+                        trainIndices += ccTrainIndices[cc]
+                        valIndices += ccValIndices[cc]
+                    self.trainIndices = trainIndices 
+                    self.valIndices = valIndices
+                        
+                    _, testIndices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
+                #}}}
+            else:
+                raise ValueError('Sub Class Extraction not implemented for {}'.format(params.dataset))
+        #}}}
+            
+        elif ('cifar' in params.dataset) or ('imagenet' in params.dataset):
+        #{{{
             trainIndFileName = 'trainIndices_' + str(params.trainValSplit).replace('.','_') + '.csv'
             valIndFileName = 'valIndices_' + str(params.trainValSplit).replace('.','_') + '.csv'
 
-            if 'cifar10' in params.dataset:
+            # if 'cifar10' in params.dataset:
+            if params.dataset == 'cifar10':
                 trainIndFile = os.path.join(params.data_location, 'cifar-10-batches-py', trainIndFileName)
                 valIndFile = os.path.join(params.data_location, 'cifar-10-batches-py', valIndFileName)
-            elif 'cifar100' in params.dataset:
+            elif params.dataset == 'cifar100':
                 trainIndFile = os.path.join(params.data_location, 'cifar-100-python', trainIndFileName)
                 valIndFile = os.path.join(params.data_location, 'cifar-100-python', valIndFileName)
             else:
@@ -189,8 +252,12 @@ class Preproc(object):
                 valIndices = next(csvReader)
                 valIndices = [int(x) for x in valIndices]
                 self.valIndices = valIndices
+        #}}}
+        
         else:
+            # never taken at the moment
             self.trainIndices, self.valIndices = self.get_validation_set(params, trainIndices)
+        
         self.testIndices = testIndices
 
         trainLoader = torch.utils.data.DataLoader(trainSet, batch_size=params.train_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices))
@@ -198,8 +265,10 @@ class Preproc(object):
         testLoader = torch.utils.data.DataLoader(testSet, batch_size=params.test_batch, num_workers=params.workers, sampler = torch.utils.data.sampler.SubsetRandomSampler(testIndices))
 
         return trainLoader, valLoader, testLoader        
+    #}}}
 
     def imageNet(self, dataLoc, workers, params):
+    #{{{
         if params.sub_classes != []: 
             print('Generating subset of dataset with classes %s' % params.sub_classes)
             trainIndices, testIndices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
@@ -231,8 +300,10 @@ class Preproc(object):
         trainLoader, valLoader, testLoader = self.get_loaders(params, trainSet, testSet, trainIndices, testIndices)
 
         return (trainLoader, valLoader, testLoader)
+    #}}}
 
     def cifar(self, data_loc, workers, params, cifarIndex):
+    #{{{
         if cifarIndex == 100:
             data_loader = torchvision.datasets.CIFAR100
         elif cifarIndex == 10:
@@ -262,7 +333,9 @@ class Preproc(object):
         if cifarIndex == 10:
             self.trainFineY = [targets for index, (inputs, targets) in enumerate(train_set)]
         test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
-
-        train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
+        
+        # train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
+        train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set)
         
         return train_loader, val_loader, test_loader
+    #}}}

@@ -8,6 +8,7 @@ import datetime
 
 class Checkpointer(object) : 
     def __init__(self, params, configFile) : 
+    #{{{
         self.logfile = None
         self.configFile = configFile
         self.root = self.__get_root_dir(params)
@@ -20,8 +21,10 @@ class Checkpointer(object) :
                         'Train_Top1','Train_Top5','Test_Loss',\
                         'Test_Top1','Test_Top5','Val_Loss',\
                         'Val_Top1','Val_Top5']
+    #}}}
         
     def __ensure_last_epoch(self, cp_file, new_dir) : 
+    #{{{
         cp_filename = cp_file.split('/')[-1]
         epoch = cp_filename[:cp_filename.index('-')]
         dir_list = os.listdir(new_dir)
@@ -29,22 +32,28 @@ class Checkpointer(object) :
         dir_list.sort()
         if int(epoch) != dir_list[-1] : 
             raise ValueError('Resume epoch ({}) is not last epoch run ({}). If you want to run from here, use branch instead of resume'.format(epoch, dir_list[-1]))
+    #}}}
     
     def __create_dir(self, new_dir):
+    #{{{
         cmd = 'mkdir -p ' + new_dir 
         subprocess.check_call(cmd, shell=True)
 
         self.created_dir = True
+    #}}}
 
     def __create_log(self, new_dir) :
+    #{{{
         self.logfile = os.path.join(new_dir, 'log.csv')
         
         line = ',\t'.join(self.headers) + '\n'
         f = open(self.logfile, 'w+')
         f.write(line)
         f.close()
+    #}}}
 
     def __create_copy_log(self, new_root, old_root, prev_epoch) : 
+    #{{{
         self.logfile = os.path.join(new_root, 'log.csv')
         
         src = open(os.path.join(old_root, 'log.csv'), 'r') 
@@ -57,8 +66,10 @@ class Checkpointer(object) :
 
         src.close()
         dst.close()
+    #}}}
     
     def __get_root_dir(self, params) : 
+    #{{{
         assert not (params.branch == True and params.resume == True), 'Cannot branch and resume at the same time. Check config file.'
         if params.printOnly:
             return ''
@@ -106,16 +117,19 @@ class Checkpointer(object) :
             timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
             new_dir = os.path.join(params.checkpoint, params.test_name, timeStamp, 'orig')
             return new_dir
+    #}}}
     
     def setup_values(self, params):
+    #{{{
         self.values = [params.curr_epoch, params.lr, params.train_loss, \
                        params.train_top1, params.train_top5, params.test_loss, \
                        params.test_top1, params.test_top5, params.val_loss, \
                        params.val_top1, params.val_top5]
 
+    #}}}
 
-    # def save_checkpoint(self, model_dict, optimiser_dict, internal_state_dict) : 
     def save_checkpoint(self, model_dict, optimiser_dict, params) : 
+    #{{{
         if params.printOnly == True:
             return
 
@@ -151,8 +165,10 @@ class Checkpointer(object) :
             bestStatePath = os.path.join(self.root, 'best-state' + '.pth.tar')
             torch.save(model_dict, bestModelPath) 
             torch.save(params.get_state(), bestStatePath)
+        #}}}
 
     def restore_state(self, params): 
+    #{{{
         # get state to load from
         if params.resume == True or params.branch == True : 
             file_to_load = params.pretrained.replace('model', 'state')        
@@ -200,3 +216,4 @@ class Checkpointer(object) :
             params.start_epoch = 0                            
 
         return params
+    #}}}

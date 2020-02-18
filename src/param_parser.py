@@ -55,6 +55,7 @@ class Params() :
         self.test_top1 = 1
         self.test_top5 = 1
         self.bestValidLoss = 0.0
+        self.bestValidAcc = 0
 
     def get_state(self) : 
         return self.__dict__
