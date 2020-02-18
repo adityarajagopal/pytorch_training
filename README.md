@@ -29,7 +29,7 @@ config.ini
 - **Print\_Only** : Set to True will only print training progress to the terminal and will not create any log files 
 - **Train(Test)\_Batch** : Batch sizes for training or test
 - **Min_LR** : Minimum learning rate for training
-- **LR(Momentum)\_Schedule** : Schedule for LR / Momentum. Follows pattern <epoch> <lr> <epoch> <lr> ... If <lr> is -1 the current learning rate is multiplied by **Gamma**, otherwise value of <lr> is used
+- **LR(Momentum)\_Schedule** : Schedule for LR / Momentum. Follows pattern \<epoch\> \<lr\> \<epoch\> \<lr\> ... If \<lr\> is -1 the current learning rate is multiplied by **Gamma**, otherwise value of \<lr\> is used
 - **Train\_Val\_Split** : Percentage of training dataset that is split into the training set. The remaining percentage becomes the validation set
 - Other training\_hyperparameters are self explanatory 
 
