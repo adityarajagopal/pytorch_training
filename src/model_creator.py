@@ -54,7 +54,6 @@ class ModelCreator(object):
     
         if params.evaluate == True : 
             checkpoint = torch.load(params.pretrained)
-            # model.load_state_dict(checkpoint['state_dict'])
             model.load_state_dict(checkpoint)
             
         torch.backends.cudnn.benchmark = True

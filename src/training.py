@@ -53,6 +53,7 @@ class Trainer(object):
             # train model
             loss, prec1, prec5 = self.train(model, criterion, optimiser, inputs, targets)
             
+            # added losses to update the loss
             losses.update(loss) 
             top1.update(prec1) 
             top5.update(prec5)
@@ -62,16 +63,20 @@ class Trainer(object):
     def train_network(self, params, tbx_writer, checkpointer, train_loader, valLoader, test_loader, model, criterion, optimiser, inferer):  
         print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5,\tVal_Loss,\tVal_Top1,\tVal_Top5')
         
+        # iterate over the epochs
         for epoch in tqdm(range(params.start_epoch, params.epochs), desc='training', leave=False) : 
             params.curr_epoch = epoch
             state = self.update_lr(params, optimiser)
     
+            # setup train loss, top1 and top5 averaging units
             losses = utils.AverageMeter()
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
             
+            # iterate batches in an epoch
             self.batch_iter(model, criterion, optimiser, train_loader, params, losses, top1, top5)
             
+            # record train loss
             params.train_loss = losses.avg        
             params.train_top1 = top1.avg        
             params.train_top5 = top5.avg        

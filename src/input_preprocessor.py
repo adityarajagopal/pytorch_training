@@ -15,8 +15,6 @@ class Preproc(object):
     
     def import_and_preprocess_dataset(self, params) : 
         dataset = params.dataset 
-        train_batch = params.train_batch 
-        test_batch = params.test_batch 
         workers = params.workers
         data_loc = params.data_location
         
@@ -191,9 +189,6 @@ class Preproc(object):
                 valIndices = next(csvReader)
                 valIndices = [int(x) for x in valIndices]
                 self.valIndices = valIndices
-            
-            # testIndices = list(range(len(testSet)))
-            # self.testIndices = testIndices
         else:
             self.trainIndices, self.valIndices = self.get_validation_set(params, trainIndices)
         self.testIndices = testIndices
@@ -205,7 +200,6 @@ class Preproc(object):
         return trainLoader, valLoader, testLoader        
 
     def imageNet(self, dataLoc, workers, params):
-        # data_loc = '/mnt/storage/imagenet_original/data'
         if params.sub_classes != []: 
             print('Generating subset of dataset with classes %s' % params.sub_classes)
             trainIndices, testIndices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
@@ -239,7 +233,6 @@ class Preproc(object):
         return (trainLoader, valLoader, testLoader)
 
     def cifar(self, data_loc, workers, params, cifarIndex):
-        # data_loc = '/home/ar4414/multipres_training/organised/data'
         if cifarIndex == 100:
             data_loader = torchvision.datasets.CIFAR100
         elif cifarIndex == 10:
@@ -249,9 +242,6 @@ class Preproc(object):
         if params.sub_classes != []: 
             print('Generating subset of dataset with classes %s' % params.sub_classes)
             train_indices, test_indices = self.create_subclass_dataset(params.dataset, params.sub_classes) 
-            # with open("{}.csv".format(params.sub_classes[0]), 'w') as writeFile:
-            #     writer = csv.writer(writeFile)
-            #     writer.writerows([train_indices])
         else:
             train_indices = None
             test_indices = None

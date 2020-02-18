@@ -16,7 +16,6 @@ class Params() :
         self.growth_rate = config_file.getint('cnn', 'growth_rate')
         self.compression_rate = config_file.getint('cnn', 'compression_rate')
 
-        # self.start_epoch = config_file.getint('training_hyperparameters', 'start_epoch')
         self.printOnly = config_file.getboolean('training_hyperparameters', 'print_only')
         self.epochs = config_file.getint('training_hyperparameters', 'total_epochs')
         self.train_batch = config_file.getint('training_hyperparameters', 'train_batch')
@@ -42,7 +41,6 @@ class Params() :
         self.branch = config_file.getboolean('pytorch_parameters', 'branch')
         self.evaluate = config_file.getboolean('pytorch_parameters', 'evaluate')
         self.tee_printing = config_file.get('pytorch_parameters', 'tee_printing')
-        self.enableTbx = config_file.getboolean('pytorch_parameters', 'enable_tbx', fallback=False)
         
         self.gpuList = [int(x) for x in self.gpu_id.split(',')]
 

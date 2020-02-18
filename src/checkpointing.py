@@ -200,19 +200,3 @@ class Checkpointer(object) :
             params.start_epoch = 0                            
 
         return params
-        
-
-
-
-
-
-
-
-                
-
-
-            
-
-             
-
-        
