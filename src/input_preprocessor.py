@@ -13,7 +13,6 @@ import csv
 import json
 
 class Preproc(object):
-    
     def import_and_preprocess_dataset(self, params) : 
         #{{{
         dataset = params.dataset 
@@ -179,7 +178,6 @@ class Preproc(object):
         
         if params.sub_classes != []: 
         #{{{
-            print('Generating subset of dataset with classes %s' % params.sub_classes)
             trainIndFileName = 'coarseTrainIndices_' + str(params.trainValSplit).replace('.','_') + '.json'
             valIndFileName = 'coarseValIndices_' + str(params.trainValSplit).replace('.','_') + '.json'
 
@@ -334,8 +332,7 @@ class Preproc(object):
             self.trainFineY = [targets for index, (inputs, targets) in enumerate(train_set)]
         test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
         
-        # train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
-        train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set)
+        train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
         
         return train_loader, val_loader, test_loader
     #}}}
