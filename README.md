@@ -3,6 +3,8 @@
 This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
 > Note : For all files regarding MuPPET including the main, look in the ./src/muppet directory. 
 
+- For running the AdAPT pruning framework, run "git submodule update --init src/ar4414/pruning"
+
 pytorch\_training.yml
 -----------------------
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
