@@ -3,7 +3,7 @@
 This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
 > Note : For all files regarding MuPPET including the main, look in the ./src/muppet directory. 
 
-- For running the AdAPT pruning framework, run "git submodule update --init src/ar4414/pruning"
+- For running the ADaPT pruning framework, run "git submodule update --init src/ar4414/pruning"
 
 pytorch\_training.yml
 -----------------------
