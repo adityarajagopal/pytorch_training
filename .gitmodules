@@ -12,7 +12,7 @@
 	url = git@github.com:adityarajagopal/nas.git
 [submodule "src/ar4414/pruning"]
 	path = src/ar4414/pruning
-	url = git@github.com:adityarajagopal/pruning.git
+	url = https://github.com/adityarajagopal/pruning.git 
 [submodule "src/dav114/hamming_distance_training"]
 	path = src/dav114/hamming_distance_training
 	url = git@github.com:DiederikVink/hamming_distance_training.git
