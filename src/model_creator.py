@@ -1,8 +1,10 @@
-import models 
+import sys
+
 import torch.nn
 import torch.backends
 import torchvision 
-import sys
+
+import models 
 
 class ModelCreator(object):
     
@@ -57,7 +59,7 @@ class ModelCreator(object):
             model.load_state_dict(checkpoint)
             
         torch.backends.cudnn.benchmark = True
-        print('Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
+        print('==> Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
 
         return model
     

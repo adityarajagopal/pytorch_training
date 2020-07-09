@@ -6,7 +6,7 @@ import math
 import src.utils as utils
 
 class Inferer(object):
-    def test_network(self, params, test_loader, model, criterion, optimiser) :  
+    def test_network(self, params, test_loader, model, criterion, optimiser, verbose=True) :  
         model.eval()
             
         losses = utils.AverageMeter()
@@ -30,7 +30,7 @@ class Inferer(object):
             top1.update(prec1.item()) 
             top5.update(prec5.item())
     
-        if params.evaluate == True : 
+        if verbose : 
             tqdm.write('Loss: {}, Top1: {}, Top5: {}'.format(losses.avg, top1.avg, top5.avg))
         
         return (losses.avg, top1.avg, top5.avg)

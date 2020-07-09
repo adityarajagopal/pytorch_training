@@ -27,19 +27,11 @@ class Application(object):
         self.setup_model()
         self.setup_tee_printing()
         
-        # setup tensorboardX and checkpointer  
-        # if self.params.enableTbx: 
-        #     self.tbx_writer = tbx.SummaryWriter(comment='-test-1')
-        # else:
-        #     self.tbx_writer = None
-
         if self.params.evaluate == False : 
             self.run_training()
         else : 
             self.run_inference()
 
-        # if self.params.enableTbx:
-        #     self.tbx_writer.close()
         self.tbx_writer = None
 
     def run_training(self):

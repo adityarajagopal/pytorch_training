@@ -29,12 +29,12 @@ class Params() :
         self.lr_schedule = [self.__to_num(i) for i in config_file.get('training_hyperparameters', 'lr_schedule').split()]
         self.trainValSplit = config_file.getfloat('training_hyperparameters', 'train_val_split')
         
-        self.sub_classes = config_file.get('pruning_hyperparameters', 'sub_classes').split() 
+        self.sub_classes = config_file.get('pruning_hyperparameters', 'sub_classes', fallback='').split() 
 
         self.manual_seed = config_file.getint('pytorch_parameters', 'manual_seed')
         self.workers = config_file.getint('pytorch_parameters', 'data_loading_workers')
         self.gpu_id = config_file.get('pytorch_parameters', 'gpu_id')
-        self.pretrained = config_file.get('pytorch_parameters', 'pretrained')        
+        self.pretrained = config_file.get('pytorch_parameters', 'pretrained', fallback=None)        
         self.checkpoint = config_file.get('pytorch_parameters', 'checkpoint_path')
         self.test_name = config_file.get('pytorch_parameters', 'test_name')
         self.resume = config_file.getboolean('pytorch_parameters', 'resume')
