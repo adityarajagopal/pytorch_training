@@ -6,7 +6,7 @@
 	url = https://github.com/adityarajagopal/pruning.git 
 [submodule "src/ar4414/memory_model"]
 	path = src/ar4414/memory_model
-	url = https://github.com/adityarajagopal/memory_model.git 
+	url = git@github.com:adityarajagopal/memory_model.git 
 
 [submodule "src/dav114/importance_sampling"]
 	path = src/dav114/importance_sampling
