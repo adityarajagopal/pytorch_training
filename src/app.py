@@ -89,10 +89,14 @@ class Application(object):
         # setup random number generator
         print('==> Setting up random number seed')
         if self.params.manual_seed is None or self.params.manual_seed < 0 : 
+            print("Benchmarking mode")
             self.params.manual_seed = random.randint(1, 10000)
+            torch.backends.cudnn.benchmark = True
+            torch.backends.cudnn.deterministic = False 
         else:
-            torch.backends.cudnn.deterministic = True
+            print("Deterministic mode")
             torch.backends.cudnn.benchmark = False
+            torch.backends.cudnn.deterministic = True
 
         random.seed(self.params.manual_seed) 
         torch.manual_seed(self.params.manual_seed)
