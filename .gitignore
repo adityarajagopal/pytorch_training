@@ -8,4 +8,5 @@ src/__pycache__
 src/main_template.py
 src/dav114/backups/*
 src/ar4414/pruners
+src/ar4414/performance_model
 *main.py
