@@ -35,10 +35,11 @@ class ModelCreator(object):
         if params.arch.endswith('resnet'):
             model = models.__dict__[params.arch](
                         num_classes=num_classes,
-                        depth=params.depth
+                        depth=params.depth,
+                        pretrained=params.tvLoad
                     )
         else:
-            model = models.__dict__[params.arch](num_classes=num_classes)
+            model = models.__dict__[params.arch](num_classes=num_classes, pretrained=params.tvLoad)
 
         return model
 
@@ -58,7 +59,6 @@ class ModelCreator(object):
             checkpoint = torch.load(params.pretrained)
             model.load_state_dict(checkpoint)
             
-        torch.backends.cudnn.benchmark = True
         print('==> Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
 
         return model

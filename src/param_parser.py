@@ -37,6 +37,8 @@ class Params() :
         self.pretrained = config_file.get('pytorch_parameters', 'pretrained', fallback=None)        
         self.checkpoint = config_file.get('pytorch_parameters', 'checkpoint_path')
         self.test_name = config_file.get('pytorch_parameters', 'test_name')
+        # load pretrained model from torchvision
+        self.tvLoad = config_file.getboolean('pytorch_parameters', 'TV_load')
         self.resume = config_file.getboolean('pytorch_parameters', 'resume')
         self.branch = config_file.getboolean('pytorch_parameters', 'branch')
         self.evaluate = config_file.getboolean('pytorch_parameters', 'evaluate')
