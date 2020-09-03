@@ -642,7 +642,8 @@ class ImageNet(object):
     
     def create_loaders(self, trainSet, testSet):
     #{{{
-        if self.params.pruningParams['sub_classes'] != '' or eval(self.params.pruningParams['from_robust']):
+        # if self.params.pruningParams['sub_classes'] != '' or eval(self.params.pruningParams['from_robust']):
+        if self.params.pruningParams is not None:
             trainIndices, valIndices, testIndices = self.create_subclass_dataset(trainSet, testSet)
         else:
         #{{{

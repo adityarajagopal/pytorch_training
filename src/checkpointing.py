@@ -112,9 +112,17 @@ class Checkpointer(object) :
             
             return new_dir
 
+        elif 'restore' in params.dapr.keys(): 
+            root = params.dapr['restore'].split('/')[:-1]
+            root = '/'.join(root)
+            return root
+
         else :
             ts = time.time()
             timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
+            if params.pruningParams is not None:
+                subset = params.pruningParams['sub_name']
+                params.test_name = f"{params.test_name}_{subset}"
             new_dir = os.path.join(params.checkpoint, params.test_name, timeStamp, 'orig')
             return new_dir
     #}}}
