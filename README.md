@@ -2,6 +2,8 @@
 ==============================
 This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
 
+For details about **Now that I can see, I can improve: Enabling data-drive finetuning on CNNs on the edge**, please checkout https://github.com/adityarajagopal/pruning.git. 
+
 pytorch\_training.yml
 -----------------------
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
