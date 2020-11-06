@@ -2,20 +2,6 @@
 ==============================
 This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
 
-**ADaPT Pruning Framework**
-
-For running the ADaPT pruning framework, run "git submodule update --init src/ar4414/pruning". The associated paper was published in the EDLCV workshop in CVPR 2020. If you use this tool in a publication, we would appreciate using the following citation:  
-```
-@misc{rajagopal2020i,
-      title={Now that I can see, I can improve: Enabling data-driven finetuning of CNNs on the edge}, 
-      author={Aditya Rajagopal and Christos-Savvas Bouganis},
-      year={2020},
-      eprint={2006.08554},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
-```
-
 pytorch\_training.yml
 -----------------------
 Anaconda config file that can be used to setup a conda environment with all the required dependencies. The list of dependencies can be found in this file.
@@ -59,15 +45,6 @@ config.ini
 - **Evaluate** : If set to True, inference will be performed on the checkpointed model in **Pretrained**, with hyperparameters specified in this config file. 
 - **Tee\_Printing** : If a csv file is specified here, it overloads the print function in Python such that if the string passed into the print function starts with a **~**, the print function will write both to stdout and to the csv specified here. If left as None, the print function is not overloaded. 
 
-> MuPPET\_Hyperparameters
-- **Run\_Muppet** : If False, all following parameters are ignored and regular training is performed 
-- **Bit\_Width** : Bitwidth at which MuPPET training begins. If FP32, set to -1 
-- **Data\_Type** : One of "DFixed" or "Float". Has to match **Bit\_Width** specified
-- **Round\_Meth** : One of "Simple" or "Stochastic"
-- **Policy\_Resolution** : Refer to resolution hyperparameter in associated paper  
-- **Policy\_Patience** : Refer to patience hyperparameter in associated paper
-- **Fp32\_Epochs\_Per\_Lr** : Number of epochs run at each learning rate once in FP32 training  
-- **Prec\_Schedule** : Precisions to change into at each switch. First precision must match with the value for **Bit\_Width**
 
 > *Note*: Only one of **Resume**, **Branch**, or **Evaluate** can be set to True at any given time. Directory structure for checkpointing will be specified in the section describing the checkpointing.py file.
 
