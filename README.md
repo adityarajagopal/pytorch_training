@@ -2,7 +2,17 @@
 ==============================
 This repository provides a modular base to train CNNs using Pytorch. The list of files in the directory and their functions are described below. 
 
-- For running the ADaPT pruning framework, run "git submodule update --init src/ar4414/pruning"
+For running the ADaPT pruning framework, run "git submodule update --init src/ar4414/pruning". The associated paper was published in the EDLCV workshop in CVPR 2020. If you use this tool in a publication, we would appreciate using the following citation:  
+```
+@misc{rajagopal2020i,
+      title={Now that I can see, I can improve: Enabling data-driven finetuning of CNNs on the edge}, 
+      author={Aditya Rajagopal and Christos-Savvas Bouganis},
+      year={2020},
+      eprint={2006.08554},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
 
 pytorch\_training.yml
 -----------------------
