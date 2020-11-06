@@ -112,11 +112,6 @@ class Checkpointer(object) :
             
             return new_dir
 
-        elif 'restore' in params.dapr.keys(): 
-            root = params.dapr['restore'].split('/')[:-1]
-            root = '/'.join(root)
-            return root
-
         else :
             ts = time.time()
             timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')

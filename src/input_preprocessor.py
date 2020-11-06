@@ -339,10 +339,7 @@ class Preproc(object):
         if cifarIndex == 10:
             self.trainFineY = [targets for index, (inputs, targets) in enumerate(train_set)]
         test_set = data_loader(root=data_loc, train=False, download=False, transform=test_transform)
-        
-        breakpoint()
         train_loader, val_loader, test_loader = self.get_loaders(params, train_set, test_set, train_indices, test_indices)
-        breakpoint()
         
         return train_loader, val_loader, test_loader
     #}}}
