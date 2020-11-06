@@ -1,28 +1,27 @@
-[submodule "src/muppet"]
-	path = src/muppet
-	url = git@github.com:adityarajagopal/muppet.git
+# [submodule "src/muppet"]
+# 	path = src/muppet
+# 	url = git@github.com:adityarajagopal/muppet.git
 [submodule "src/ar4414/pruning"]
 	path = src/ar4414/pruning
 	url = https://github.com/adityarajagopal/pruning.git 
-[submodule "src/ar4414/memory_model"]
-	path = src/ar4414/memory_model
-	url = https://github.com/adityarajagopal/memory_model.git 
-
-[submodule "src/dav114/importance_sampling"]
-	path = src/dav114/importance_sampling
-	url = git@github.com:DiederikVink/importance_sampling.git
-[submodule "src/dav114/batch_var"]
-	path = src/dav114/batch_var
-	url = git@github.com:DiederikVink/batch_var.git
-[submodule "src/dav114/hamming_distance_training"]
-	path = src/dav114/hamming_distance_training
-	url = git@github.com:DiederikVink/hamming_distance_training.git
-[submodule "src/dav114/metric_train"]
-	path = src/dav114/metric_train
-	url = git@github.com:DiederikVink/metric_train.git
-[submodule "src/dav114/quant"]
-	path = src/dav114/quant
-	url = git@github.com:DiederikVink/quant.git
-[submodule "src/dav114/predict_g"]
-	path = src/dav114/predict_g
-	url = git@github.com:DiederikVink/predict_g.git
+# [submodule "src/ar4414/memory_model"]
+# 	path = src/ar4414/memory_model
+# 	url = https://github.com/adityarajagopal/memory_model.git 
+# [submodule "src/dav114/importance_sampling"]
+# 	path = src/dav114/importance_sampling
+# 	url = git@github.com:DiederikVink/importance_sampling.git
+# [submodule "src/dav114/batch_var"]
+# 	path = src/dav114/batch_var
+# 	url = git@github.com:DiederikVink/batch_var.git
+# [submodule "src/dav114/hamming_distance_training"]
+# 	path = src/dav114/hamming_distance_training
+# 	url = git@github.com:DiederikVink/hamming_distance_training.git
+# [submodule "src/dav114/metric_train"]
+# 	path = src/dav114/metric_train
+# 	url = git@github.com:DiederikVink/metric_train.git
+# [submodule "src/dav114/quant"]
+# 	path = src/dav114/quant
+# 	url = git@github.com:DiederikVink/quant.git
+# [submodule "src/dav114/predict_g"]
+# 	path = src/dav114/predict_g
+# 	url = git@github.com:DiederikVink/predict_g.git
