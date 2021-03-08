@@ -4,6 +4,3 @@
 [submodule "src/ar4414/pruning"]
 	path = src/ar4414/pruning
 	url = https://github.com/adityarajagopal/pruning.git 
-# [submodule "src/ar4414/memory_model"]
-# 	path = src/ar4414/memory_model
-# 	url = https://github.com/adityarajagopal/memory_model.git 
