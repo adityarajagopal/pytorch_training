@@ -13,24 +13,26 @@ class Inferer(object):
         top1 = utils.AverageMeter()
         top5 = utils.AverageMeter()
     
-        for batch_idx, (inputs, targets) in tqdm(enumerate(test_loader), total=len(test_loader)-1, desc='inference', leave=False) : 
-            # move inputs and targets to GPU
-            with torch.no_grad():
-                device = 'cuda:' + str(params.gpuList[0])
-                if params.use_cuda : 
-                    inputs, targets = inputs.cuda(device, non_blocking=True), targets.cuda(device, non_blocking=True)
-                
-                # perform inference 
-                outputs = model(inputs) 
-                loss = criterion(outputs, targets)
-            
-            prec1, prec5 = utils.accuracy(outputs.data, targets.data)
-    
-            losses.update(loss.item()) 
-            top1.update(prec1.item()) 
-            top5.update(prec5.item())
-    
-        if verbose : 
-            tqdm.write('Loss: {}, Top1: {}, Top5: {}'.format(losses.avg, top1.avg, top5.avg))
+        with torch.no_grad():
+            with tqdm(total=len(test_loader), desc='Inference', leave=verbose) as t:
+                for batch_idx, (inputs, targets) in enumerate(test_loader): 
+                    device = 'cuda:' + str(params.gpuList[0])
+                    inputs, targets = inputs.cuda(device, non_blocking=True),\
+                            targets.cuda(device, non_blocking=True)
+                    
+                    outputs = model(inputs) 
+                    loss = criterion(outputs, targets)
+                    
+                    prec1, prec5 = utils.accuracy(outputs.data, targets.data)
+                    losses.update(loss.item()) 
+                    top1.update(prec1.item()) 
+                    top5.update(prec5.item())
+
+                    t.set_postfix({
+                        'loss': losses.avg,
+                        'top1': top1.avg,
+                        'top5': top5.avg
+                    })
+                    t.update(1)
         
         return (losses.avg, top1.avg, top5.avg)
