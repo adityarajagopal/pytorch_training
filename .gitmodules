@@ -4,3 +4,6 @@
 [submodule "src/ar4414/pruning"]
 	path = src/ar4414/pruning
 	url = https://github.com/adityarajagopal/pruning.git 
+[submodule "src/adapt/lego"]
+	path = src/adapt/lego
+	url = git@github.com:adityarajagopal/lego.git
