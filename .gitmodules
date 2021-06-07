@@ -7,3 +7,6 @@
 [submodule "src/adapt/lego"]
 	path = src/adapt/lego
 	url = git@github.com:adityarajagopal/lego.git
+[submodule "src/adapt/performance_prediction"]
+	path = src/adapt/performance_prediction
+	url = https://github.com/adityarajagopal/performance_prediction.git

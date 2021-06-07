@@ -10,5 +10,4 @@ src/dav114/backups/*
 src/ar4414/pruners
 src/ar4414/performance_model
 src/ar4414/memory_model
-src/adapt/performance_prediction
 *main.py
